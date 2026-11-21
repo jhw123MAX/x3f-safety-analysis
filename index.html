@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>「陆地航母」X3-F 的安全账 · 从运行概念到 10⁻⁹ 的预算</title>
-<meta name="description" content="针对小鹏汇天「陆地航母」飞行体 X3-F 的系统安全分析：运行概念、审定基础、FHA/STPA、FTA/CCA、关键子系统、运行限制与安全论证。">
+<title>「倾转旋翼」的安全账 · 从转换走廊到 10⁻⁹ 的预算</title>
+<meta name="description" content="针对倾转旋翼 eVTOL 的系统安全分析：转换走廊、倾转作动、电机级冗余与隔离、FHA/STPA、FTA/CCA、运行限制与安全论证。">
 <style>
 :root{
   --paper:#f4f1e8;
@@ -194,13 +194,13 @@ strong{font-weight:600}
 .matrix{border:1px solid var(--rule);background:#faf8f2;padding:16px;overflow-x:auto}
 .mgrid{display:grid;grid-template-columns:56px repeat(4,1fr);gap:3px;min-width:520px}
 .mgrid .hd{display:grid;place-items:center;font-family:var(--mono);font-size:10.5px;color:var(--ink-3);padding:5px 2px;text-align:center;line-height:1.3}
-.mgrid .cell{min-height:46px;border:1px solid var(--rule-2);display:flex;flex-wrap:wrap;gap:3px;align-content:center;justify-content:center;padding:3px}
+.mgrid .cell{min-height:46px;border:1px solid var(--rule-2);display:flex;flex-wrap:wrap;gap:5px;align-content:center;justify-content:center;padding:4px}
 .mgrid .cell.r1{background:rgba(31,77,63,.06)}
 .mgrid .cell.r2{background:rgba(31,77,63,.13)}
 .mgrid .cell.r3{background:rgba(168,100,26,.14)}
 .mgrid .cell.r4{background:rgba(156,47,31,.14)}
 .mgrid .cell.r5{background:rgba(156,47,31,.28)}
-.mdot{font-family:var(--mono);font-size:10px;width:19px;height:19px;display:grid;place-items:center;border:1px solid var(--ink);background:var(--paper);cursor:pointer;border-radius:50%}
+.mdot{font-family:var(--mono);font-size:9.5px;width:24px;height:24px;display:grid;place-items:center;border:1px solid var(--ink);background:var(--paper);cursor:pointer;border-radius:50%;flex:none}
 .mdot:hover,.mdot.on{background:var(--ink);color:var(--paper)}
 .mdetail{margin-top:12px;font-size:13.5px;line-height:1.75;color:var(--ink-2);border-top:1px solid var(--rule);padding-top:10px;min-height:60px}
 .mdetail b{color:var(--ink)}
@@ -229,19 +229,19 @@ strong{font-weight:600}
 
 <header class="cover">
   <div class="stamp">
-    <span>文件编号 <b>SAF-X3F-2026-11</b></span>
+    <span>文件编号 <b>SAF-TILT-2026-11</b></span>
     <span>版本 <b>1.0</b></span>
     <span>编制日期 <b>2026-11-21</b></span>
     <span>密级 <b>公开</b></span>
   </div>
 
-  <h1>「陆地航母」X3-F 的安全账<br><em>从运行概念到 10⁻⁹ 的预算</em></h1>
+  <h1>倾转旋翼的安全账<br><em>从转换走廊到 10⁻⁹ 的预算</em></h1>
 
-  <p class="deck">它被限定在"私人娱乐"这一档，而不是"载客运营"。这个口径几乎决定了整本安全账怎么算——也决定了哪些证据现在必须有，哪些可以晚一点。</p>
+  <p class="deck">上一份算的是构型的技术账——盘载荷、功率、航程。这一份算同一个选择的安全账：倾转旋翼把巡航效率做到最好，也把"在空中改变构型"变成了全机最窄的安全余度。</p>
 
   <div class="byline">
     <span>课程 <b>飞行汽车技术基础</b></span>
-    <span>范围 <b>整机功能 · 危害 · 因果 · 运行</b></span>
+    <span>范围 <b>转换段 · 倾转作动 · 冗余与隔离</b></span>
     <span>方法 <b>FHA / STPA / FTA / CCA ＋ 公开资料复核</b></span>
   </div>
 </header>
@@ -249,7 +249,7 @@ strong{font-weight:600}
 <nav class="toc" id="toc">
   <ol>
     <li><a href="#s1"><i>01</i>摘要</a></li>
-    <li><a href="#s2"><i>02</i>系统与场景</a></li>
+    <li><a href="#s2"><i>02</i>构型与转换段</a></li>
     <li><a href="#s3"><i>03</i>审定基础</a></li>
     <li><a href="#s4"><i>04</i>危害识别</a></li>
     <li><a href="#s5"><i>05</i>因果与定量</a></li>
@@ -267,162 +267,169 @@ strong{font-weight:600}
   <div class="abstract">
     <h2>三句话</h2>
     <ol>
-      <li><strong>架构方向是对的，缺的是证据。</strong>六轴六桨、2 副失效仍可控、飞控三套、供电与通信各两套——这套组合在工程上说得通。但"有几套冗余"是设计输入，"共因会不会同时打掉它们"才是安全结论，而后者需要 CCA 与 SSA，目前公开渠道看不到。</li>
-      <li><strong>真正吃掉预算的是单点与共因，不是独立失效。</strong>3 副旋翼同时失效在独立假设下只有 2.5×10⁻¹²／小时，小到可以忽略；可一旦共因比例 β 停在 10⁻²，飞控一项就是 2×10⁻⁶——比 10⁻⁹ 的目标高三个数量级。</li>
-      <li><strong>"私人娱乐"这个口径，决定整本账的算法。</strong>风险由知情同意的乘员承担、飞行被限制在昼间隔离空域与营地上空，所以它不必按载客运营去堆证据；反过来，一旦要商业载客，场景、目标概率、DAL 分配、运行限制全部要重做。</li>
+      <li><strong>倾转旋翼的难点不在悬停，也不在巡航，在中间那一段。</strong>悬停和固定翼巡航各自都是成熟技术，唯独"在空中把构型从一种变成另一种"没有先例可抄：短舱要转、升力要交出去、推力要接上来，而这一切发生在低空、低速、离地几十米的窗口里。</li>
+      <li><strong>它的冗余做到了电机级，但救不了作动器卡阻。</strong>以公开的 S4 为例：六个倾转螺旋桨、每个桨两台电机、每台电机两路逆变器、四组互相隔离的电池、三套电传飞控，丢一个桨仍能飞。可倾转作动器一旦卡住，多装一套电机不解决问题——它需要的是另一条独立的作动路径。</li>
+      <li><strong>三种构型的安全账是同一条斜率的交易。</strong>多旋翼最简单、取证最快、航程最短；复合翼折中；倾转效率最高、论证最难。选构型其实是在选"你愿意用哪种难法"，而不是选"谁更安全"。</li>
     </ol>
   </div>
 
-  <p class="lead">这份材料的做法是：把 X3-F 的公开信息按"硬约束—厂商口径—推定"三级摆开，再用课程讲的那套系统安全工程把它走一遍——先定场景，再列危害，然后逐条追问因果，最后看证据够不够支撑结论。凡是只能靠公开资料推断的，文中一律写明"推定"；凡是我自己算的示例数字，都标为量级演示，不冒充实测。</p>
+  <p class="lead">这份材料的做法是：把倾转旋翼的安全问题按"阶段—危害—因果—证据"拆开，重点放在转换段；所有涉及具体型号的说法都以公开资料为准，标"厂商口径"；凡是我自己算的数字，都标为量级演示，不冒充实测。</p>
 
-  <p>结论不涉及"这架飞机安不安全"这种一句话判决。安全是<b>场景的函数</b>：在营地、昼间、双人、非商业运营的条件下，它可能是一门成立的生意；把这套结论平移到城市载客，<mark>一行都不成立</mark>。</p>
+  <p>结论不涉及"倾转旋翼安不安全"这种一句话判决。它是<b>包线的函数</b>：在转换走廊里、在设计的冗余下、在有资质的运行中，它能做到 10⁻⁹ 量级；一旦出了走廊，或者作动器没有第二条路，剩下的就只有时间。</p>
 </section>
+
 <section id="s2">
-  <h2><span class="num">02</span>系统与场景</h2>
-  <div class="sub">System &amp; operational concept</div>
+  <h2><span class="num">02</span>构型与转换段</h2>
+  <div class="sub">Configuration &amp; transition</div>
 
-  <p>「陆地航母」不是一架飞机，也不是一辆车。它是把地面行驶与空中飞行拆成两个独立合规主体，再用一套可拆的机构合成一件商品：<b>飞行体按航空器审定，陆行体按机动车管理</b>，而两者结合之后的状态——装载着飞行体在公路上行驶——既不是纯汽车也不是纯飞机。</p>
-
-  <p>这个结构带来一个别人没有的好处：车规与适航互不迁就，各自干净。也带来一个别人没有的麻烦：<b>接口</b>。它是全机唯一同时承载两种相反安全要求的地方——地面要可靠解锁，空中要绝对锁死。</p>
+  <p>三种主流构型的区别，不在外形，而在<b>升力和推力是不是同一套旋翼</b>。这一点决定了失效模式、冗余方式和取证难度。</p>
 
   <figure>
     <div class="canvas">
-      <svg viewBox="0 0 660 340" role="img" aria-label="X3-F 三主体结构与三条安全边界示意">
-        <g fill="none" stroke="#17161a" stroke-width="1.2">
-          <line x1="290" y1="92" x2="398" y2="92"/>
-          <line x1="290" y1="92" x2="344" y2="38"/>
-          <line x1="290" y1="92" x2="236" y2="38"/>
-          <line x1="290" y1="92" x2="182" y2="92"/>
-          <line x1="290" y1="92" x2="236" y2="146"/>
-          <line x1="290" y1="92" x2="344" y2="146"/>
-          <circle cx="398" cy="92" r="15"/><circle cx="344" cy="38" r="15"/>
-          <circle cx="236" cy="38" r="15"/><circle cx="182" cy="92" r="15"/>
-          <circle cx="236" cy="146" r="15"/><circle cx="344" cy="146" r="15"/>
+      <svg viewBox="0 0 880 300" role="img" aria-label="三种 eVTOL 构型的侧视对比：多旋翼、复合翼、倾转旋翼">
+        <g stroke="#17161a" stroke-width="1.2" fill="none">
+          <!-- 多旋翼 -->
+          <rect x="40" y="120" width="120" height="34" rx="16"/>
+          <line x1="60" y1="116" x2="60" y2="98"/><line x1="100" y1="116" x2="100" y2="98"/><line x1="140" y1="116" x2="140" y2="98"/>
+          <circle cx="60" cy="92" r="16"/><circle cx="100" cy="92" r="16"/><circle cx="140" cy="92" r="16"/>
+          <!-- 复合翼 -->
+          <rect x="330" y="130" width="130" height="26" rx="12"/>
+          <line x1="395" y1="130" x2="395" y2="112"/><circle cx="395" cy="106" r="15"/>
+          <line x1="340" y1="130" x2="340" y2="116"/><circle cx="340" cy="110" r="12"/>
+          <line x1="450" y1="130" x2="450" y2="116"/><circle cx="450" cy="110" r="12"/>
+          <line x1="460" y1="143" x2="482" y2="143"/><circle cx="488" cy="143" r="9"/>
+          <path d="M330 130 L310 118 L330 118 Z"/>
+          <!-- 倾转 -->
+          <rect x="620" y="130" width="140" height="26" rx="12"/>
+          <path d="M620 130 L600 118 L620 118 Z"/>
+          <line x1="660" y1="130" x2="660" y2="104"/><circle cx="660" cy="98" r="16" stroke-dasharray="3 2"/>
+          <line x1="720" y1="130" x2="720" y2="104"/><circle cx="720" cy="98" r="16" stroke-dasharray="3 2"/>
+          <g stroke-dasharray="3 2">
+            <line x1="660" y1="82" x2="660" y2="72"/><line x1="720" y1="82" x2="720" y2="72"/>
+          </g>
         </g>
-        <ellipse cx="290" cy="92" rx="50" ry="17" fill="#faf8f2" stroke="#17161a" stroke-width="1.2"/>
-        <text x="290" y="96" text-anchor="middle" font-family="var(--mono)" font-size="10" fill="#4c4840">X3-F</text>
-
-        <line x1="290" y1="112" x2="290" y2="184" stroke="#7a746a" stroke-width="1" stroke-dasharray="4 4"/>
-        <rect x="252" y="186" width="76" height="24" fill="#faf8f2" stroke="#9c2f1f" stroke-width="1.1" stroke-dasharray="5 4"/>
-        <text x="290" y="202" text-anchor="middle" font-family="var(--mono)" font-size="9.5" fill="#9c2f1f">分合机构</text>
-        <text x="340" y="202" font-family="var(--mono)" font-size="9" fill="#7a746a">5 min 自动分合</text>
-
-        <g fill="none" stroke="#17161a" stroke-width="1.2">
-          <rect x="140" y="228" width="300" height="36"/>
-          <circle cx="176" cy="272" r="13"/><circle cx="290" cy="272" r="13"/><circle cx="404" cy="272" r="13"/>
+        <g font-family="var(--mono)" font-size="9" fill="#7a746a">
+          <text x="100" y="180" text-anchor="middle">多旋翼</text>
+          <text x="100" y="196" text-anchor="middle">升力 = 推力</text>
+          <text x="395" y="180" text-anchor="middle">复合翼</text>
+          <text x="395" y="196" text-anchor="middle">升力 ≠ 推力</text>
+          <text x="690" y="180" text-anchor="middle">倾转旋翼</text>
+          <text x="690" y="196" text-anchor="middle">升力 ⇄ 推力（可切换）</text>
         </g>
-
-        <g font-family="var(--mono)" font-size="9.5" fill="#7a746a">
-          <text x="290" y="14" text-anchor="middle">飞行体 · 六轴六桨双涵道</text>
-          <text x="290" y="250" text-anchor="middle">陆行体 · 三轴六轮 / 增程补能</text>
-          <text x="120" y="296">GROUND</text>
+        <g font-family="var(--mono)" font-size="8.5" fill="#9c2f1f">
+          <text x="100" y="220" text-anchor="middle">无机翼 · 全程靠旋翼</text>
+          <text x="395" y="220" text-anchor="middle">巡航时升力桨成死重</text>
+          <text x="690" y="220" text-anchor="middle">必须在空中改变构型</text>
         </g>
-        <line x1="120" y1="288" x2="470" y2="288" stroke="#17161a" stroke-width="1"/>
-
-        <g fill="none" stroke-width="1.1">
-          <path d="M552 32 v120 M548 32 h8 M548 152 h8" stroke="#9c2f1f"/>
-          <path d="M552 178 v40 M548 178 h8 M548 218 h8" stroke="#1f4d3f"/>
-          <path d="M552 228 v64 M548 228 h8 M548 292 h8" stroke="#2a4a6b"/>
-        </g>
-        <g font-family="var(--mono)" font-size="9.5">
-          <text x="566" y="96" fill="#9c2f1f">航空边界</text>
-          <text x="566" y="202" fill="#1f4d3f">接口</text>
-          <text x="566" y="264" fill="#2a4a6b">机动车边界</text>
+        <line x1="30" y1="248" x2="850" y2="248" stroke="#c6bfaf"/>
+        <g font-family="var(--mono)" font-size="9" fill="#7a746a">
+          <text x="30" y="266">取证难度：多旋翼 ＜ 复合翼 ＜ 倾转旋翼</text>
+          <text x="30" y="282">同一巡航速度下的效率：多旋翼 ＜ 复合翼 ＜ 倾转旋翼</text>
         </g>
       </svg>
     </div>
-    <figcaption><b>图 1</b>三主体与三条边界。右侧括注标出各段的规章归属：航空段走 CCAR-21 专用条件，机动车段走 GB 体系，中间的接口段没有现成条款。</figcaption>
+    <figcaption><b>图 1</b>三种构型的侧视对比（示意）。多旋翼把升力和推力绑死，构型不变，所以最简单；倾转旋翼要在一个飞行架次里改变构型，所以最难。</figcaption>
   </figure>
 
-  <h3>一次使用循环里，飞行只占很短一段</h3>
+  <p>倾转旋翼的飞行可以分成四段：<b>垂直起降、转换、固定翼巡航、回收</b>。前两段和最后一段都在低空，只有巡航在高空。转换段是唯一"必须改变构型"的阶段，也是全机安全余度最窄的地方。</p>
 
-  <p>把一次完整使用拆成七段，会发现飞行的占比并不大：地面行驶可能几十分钟，分合五分钟，起飞悬停一到三分钟，巡航看航线，进近着陆两三分钟，收纳与补能又是几十分钟。</p>
+  <p>转换不是瞬间动作，而是一条"走廊"：同一个短舱角度只对应一段可接受的速度，速度太低升力不够，速度太高机翼和推进系统载荷超限。走廊的上边界是结构载荷，下边界是可控性——两者之间那条窄带，就是倾转旋翼真正的包线。</p>
 
-  <p>这件事的后果是<b>指标口径</b>。适航的定量目标是"每飞行小时"的失效概率，而这类私人飞行器一年可能只飞几十小时——分母小，单次飞行的风险就被放大。所以看它的安全水平，不能只看 10⁻⁹，还要同时看"每架次"的风险，以及地面段那部分按机动车计的风险。</p>
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 820 360" role="img" aria-label="倾转旋翼的转换走廊：短舱角度与空速的关系">
+        <g stroke="#17161a" stroke-width="1.1" fill="none">
+          <line x1="90" y1="300" x2="760" y2="300"/>
+          <line x1="90" y1="300" x2="90" y2="40"/>
+        </g>
+        <path d="M150 70 C 260 78, 330 108, 430 170 C 520 226, 600 262, 690 276" fill="none" stroke="#9c2f1f" stroke-width="1.4"/>
+        <path d="M150 130 C 250 140, 320 170, 410 216 C 500 262, 580 286, 690 292" fill="none" stroke="#9c2f1f" stroke-width="1.4" stroke-dasharray="5 4"/>
+        <path d="M150 70 C 260 78, 330 108, 430 170 C 520 226, 600 262, 690 276 L 690 292 C 580 286, 500 262, 410 216 C 320 170, 250 140, 150 130 Z" fill="rgba(156,47,31,.10)" stroke="none"/>
+        <g font-family="var(--mono)" font-size="9.5" fill="#7a746a">
+          <text x="760" y="320" text-anchor="end">空速 →</text>
+          <text x="84" y="40" text-anchor="end">倾转角</text>
+          <text x="104" y="60">90°（悬停）</text>
+          <text x="84" y="296" text-anchor="end">0°（巡航）</text>
+          <text x="400" y="150" fill="#9c2f1f" text-anchor="middle">上边界：结构 / 推进系统载荷</text>
+          <text x="400" y="290" fill="#9c2f1f" text-anchor="middle">下边界：可控性</text>
+          <text x="300" y="215" fill="#17161a" text-anchor="middle">转换走廊</text>
+        </g>
+        <g font-family="var(--mono)" font-size="8.5" fill="#7a746a">
+          <text x="150" y="330">慢</text><text x="690" y="330" text-anchor="end">快</text>
+          <text x="470" y="70">越界向上：载荷超限、结构受损</text>
+          <text x="470" y="86">越界向下：升力不足、掉高度</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption><b>图 2</b>转换走廊：短舱角—空速的可行带。上边界由结构载荷与推进系统限制决定，下边界由可控性决定；走廊之外不是"性能差一点"，而是不可控或结构超载。</figcaption>
+  </figure>
 
-  <div class="table-wrap">
-    <table>
-      <thead><tr><th>阶段</th><th>时长量级</th><th>主要危害</th><th>归属</th></tr></thead>
-      <tbody>
-        <tr><td>地面行驶</td><td class="n">数十分钟</td><td>制动、重心升高、侧风稳定性</td><td>机动车</td></tr>
-        <tr><td>分合 / 装载</td><td class="n">约 5 分钟</td><td>锁未到位、误分离、异物、人员被夹</td><td class="bad">接口（灰色）</td></tr>
-        <tr><td>起飞悬停</td><td class="n">1–3 分钟</td><td>单点失效、低空风切变、地面人员暴露</td><td>航空</td></tr>
-        <tr><td>爬升巡航</td><td class="n">看航线</td><td>多单元失效、电池衰减、空域冲突</td><td>航空</td></tr>
-        <tr><td>进近着陆</td><td class="n">2–5 分钟</td><td>下沉气流、侧风、重着陆、场地障碍</td><td>航空</td></tr>
-        <tr><td>收纳固定</td><td class="n">约 5 分钟</td><td>机构误动作、夹伤</td><td class="bad">接口（灰色）</td></tr>
-        <tr><td>补能与停放</td><td class="n">数小时</td><td>充电热失控、火灾、第三方靠近</td><td>机动车的边缘</td></tr>
-      </tbody>
-    </table>
-  </div>
-  <p class="cap-note">表 1　七段使用循环。灰色两段是两套体系都不完全覆盖的地带，也是后文反复出现的地方。</p>
+  <p>这段走廊解释了为什么倾转旋翼的试飞周期长：包线不是算出来的，是一点一点试出来的，而每一次扩展都要先证明<b>出界仍可控</b>。</p>
 </section>
 
 <section id="s3">
   <h2><span class="num">03</span>审定基础</h2>
   <div class="sub">Certification basis</div>
 
-  <p>安全目标不是厂商定的，是从审定基础倒推出来的。X3-F 没有现成的类别标准可套——它既不是 CS-23 的常规飞机，也不是直升机——走的是《民用航空产品和零部件合格审定规定》下的<b>专用条件</b>：局方针对这一型号单独写一套要求。</p>
+  <p>倾转旋翼不属于任何现成类别：它有固定翼的机翼，又有直升机的旋翼，还在飞行中改变推力方向。所以各国都用"特殊类别"给它单独立规矩——美国走 21.17(b) 的 powered-lift，欧洲走 SC-VTOL-01，中国走专用条件。</p>
 
   <ul class="timeline">
     <li class="milestone">
-      <span class="when">2024-03-21</span>
-      <span class="what">型号合格证（TC）申请获民航中南局受理。确定"按航空器审定"，适用 CCAR-21。</span>
+      <span class="when">审定路径</span>
+      <span class="what">不套 CS-23 也不套 CS-27，而是按"动力升力类"（powered-lift）单独确定审定基础，逐条谈专用条件。</span>
     </li>
     <li>
-      <span class="when">2025-03</span>
-      <span class="what">局方发布专用条件征求意见稿：面向<b>私人娱乐飞行</b>，最大起飞重量不超过 960 kg，由 1 名驾驶员驾驶。场景与重量级决定了严重度分级和第三方风险口径。</span>
+      <span class="when">关键差异</span>
+      <span class="what">转换段要单独给包线、单独给失效假设：同一个失效（比如一副作动器卡阻）在悬停段和在转换段的后果不同，严重度也不同。</span>
     </li>
     <li>
-      <span class="when">2025-05-09</span>
-      <span class="what">生产许可证（PC）申请获受理。审定从"设计合规"扩展到"批产一致性"。</span>
+      <span class="when">进度（公开口径）</span>
+      <span class="what">以 S4 为例，公开信息显示仍在型号审定的飞行试验阶段（FAA Stage 3 / TIA 一类），尚未取得型号合格证。</span>
     </li>
-    <li class="dead">
+    <li>
       <span class="when">截至 2026-11</span>
-      <span class="what">TC 与 PC 均未颁发。安全论证尚未被局方"接受"，只有"受理"。</span>
+      <span class="what">全球尚无倾转旋翼 eVTOL 取得完整 TC 并投入商业载客。</span>
     </li>
   </ul>
 
-  <p>专用条件全文没有公开，所以下表的定量目标是按 SC-VTOL-01 与 CS-23 修正案 5 的通行做法<b>推定</b>的。若最终条款对"私人娱乐"档位放宽，下表的数值需要重算，但<b>方法论不变</b>——先分级，再分配目标，再逐条证明。</p>
+  <p>专用条件没有公开全文，所以下表的定量目标是按 SC-VTOL-01 与 CS-23 修正案 5 的通行做法<b>推定</b>的。对倾转旋翼来说，真正要盯的是"A 级"那一行——转换段失控、作动器卡阻、空中解体，全部落在这里。</p>
 
   <div class="table-wrap">
     <table>
-      <thead><tr><th>严重度</th><th>对飞行器 / 乘员的后果</th><th>目标概率 / 飞行小时</th><th>软件等级</th><th>X3-F 上的典型对应（推定）</th></tr></thead>
+      <thead><tr><th>严重度</th><th>对飞行器 / 乘员的后果</th><th>目标概率 / 飞行小时</th><th>软件等级</th><th>倾转旋翼上的典型对应（推定）</th></tr></thead>
       <tbody>
-        <tr><td><span class="tag-a">A 灾难性</span></td><td>机体损毁、多人死亡</td><td class="n">≤ 10⁻⁹</td><td class="n">DAL A</td><td>全部推力丧失、空中解体、空中误分离</td></tr>
-        <tr><td><span class="tag-b">B 危险</span></td><td>大幅降低安全裕度、机组难以完成任务的伤害</td><td class="n">≤ 10⁻⁷</td><td class="n">DAL B</td><td>单套飞控失效但未失控、迫降</td></tr>
-        <tr><td><span class="tag-c">C 重大</span></td><td>明显降低裕度、乘员不适或轻伤</td><td class="n">≤ 10⁻⁵</td><td class="n">DAL C</td><td>导航降级、非关键告警失效</td></tr>
+        <tr><td><span class="tag-a">A 灾难性</span></td><td>机体损毁、多人死亡</td><td class="n">≤ 10⁻⁹</td><td class="n">DAL A</td><td>转换段失控、作动器卡阻、空中解体</td></tr>
+        <tr><td><span class="tag-b">B 危险</span></td><td>大幅降低安全裕度、难以完成任务的伤害</td><td class="n">≤ 10⁻⁷</td><td class="n">DAL B</td><td>单套飞控失效、单个螺旋桨失效、被迫提前回收</td></tr>
+        <tr><td><span class="tag-c">C 重大</span></td><td>明显降低裕度、乘员不适或轻伤</td><td class="n">≤ 10⁻⁵</td><td class="n">DAL C</td><td>转换超时、导航降级、非关键告警失效</td></tr>
         <tr><td><span class="tag-d">D 轻微</span></td><td>轻微降低裕度、操作性受影响</td><td class="n">≤ 10⁻³</td><td class="n">DAL D</td><td>座舱显示异常、舒适性功能失效</td></tr>
       </tbody>
     </table>
   </div>
-  <p class="cap-note">表 2　严重度分级与目标失效概率。10⁻⁹ 是整机灾难性事件的总预算，不是某一部件单独使用的额度。</p>
+  <p class="cap-note">表 1　严重度分级与目标失效概率。10⁻⁹ 是整机灾难性事件的总预算，不是某一部件单独使用的额度。</p>
 
   <h3>同一件事，三套体系的三套说法</h3>
-
-  <p>课上反复强调"车规级 → 航规级"的跃迁。落到纸面上，就是同一句"系统不能失效"在三个体系里对应完全不同的证据要求：汽车靠 ASIL 与流程，航空靠 FDAL 加定量目标，eVTOL 在两者之上再加专用的 VTOL 条款。</p>
 
   <div class="table-wrap">
     <table>
       <thead><tr><th>维度</th><th>汽车 · ISO 26262</th><th>航空 · ARP4754A/4761</th><th>eVTOL · SC-VTOL-01</th></tr></thead>
       <tbody>
         <tr><td>等级语言</td><td>ASIL A–D</td><td>FDAL / IDAL A–E</td><td>Category Basic / Enhanced</td></tr>
-        <tr><td>顶层方法</td><td>HARA（S×E×C 定 ASIL）</td><td>FHA → PSSA → SSA</td><td>与 ARP4754A 同构，加 VTOL 专用条款</td></tr>
-        <tr><td>定量目标</td><td>不直接给概率，靠流程与架构</td><td>按严重度给 10⁻⁹ / 10⁻⁷ / 10⁻⁵</td><td>灾难性 ≤10⁻⁹（与 ARP 一致）</td></tr>
-        <tr><td>共因</td><td>DFA（相关失效分析）</td><td>CCA（ZSA + CMA + PRA）</td><td>要求独立的 CCA 证据</td></tr>
-        <tr><td>软件</td><td>ISO 26262-6</td><td>DO-178C（DAL A–D）</td><td>同 DO-178C，含模型与工具鉴定</td></tr>
-        <tr><td>运行侧</td><td>道路 / 驾驶员 / 年检</td><td>运行规章 + 持续适航</td><td>起降场、空域、UTM 均需单独批准</td></tr>
+        <tr><td>顶层方法</td><td>HARA（S×E×C 定 ASIL）</td><td>FHA → PSSA → SSA</td><td>同构，加 VTOL 专用条款</td></tr>
+        <tr><td>定量目标</td><td>不直接给概率，靠流程与架构</td><td>按严重度给 10⁻⁹ / 10⁻⁷ / 10⁻⁵</td><td>灾难性 ≤10⁻⁹</td></tr>
+        <tr><td>共因</td><td>DFA</td><td>CCA（ZSA + CMA + PRA）</td><td>要求独立的 CCA 证据</td></tr>
+        <tr><td>软件</td><td>ISO 26262-6</td><td>DO-178C（DAL A–D）</td><td>同 DO-178C</td></tr>
+        <tr><td>特殊项</td><td>—</td><td>转换段需单独给包线与失效假设</td><td>转换段、倾转作动、模式转换</td></tr>
       </tbody>
     </table>
   </div>
-  <p class="cap-note">表 3　三套体系对照。差别不在名词，而在"要拿出什么证据才算数"。</p>
-
-  <p>有一处差异值得单拎出来：地面交通的兜底是"减速停车"，这个动作几乎总在身边；飞行器的兜底只有"继续可控地飞"或"可控地落"。所以功能安全里的 fail-safe，在航空里要换成 fail-operational——同样的词，架构代价完全不同。</p>
+  <p class="cap-note">表 2　三套体系对照。倾转旋翼比多旋翼多出来的那几行，全部落在"转换"上。</p>
 </section>
+
 <section id="s4">
   <h2><span class="num">04</span>危害识别</h2>
   <div class="sub">Hazard identification · FHA &amp; STPA</div>
 
-  <p>FHA（功能危害评估）回答"哪个功能坏了会怎样"，自上而下；STPA 回答"控制行为在什么上下文里变成不安全的"，它不依赖"失效"这个前提，能抓到设计本身带来的危害。对单驾驶员加高自动化的 X3-F，第二层比第一层更容易漏。</p>
+  <p>FHA 回答"哪个功能坏了会怎样"，自上而下；STPA 回答"控制行为在什么上下文里变成不安全的"。对倾转旋翼，后者尤其重要：<b>转换</b>本身是一个受控过程，危害往往来自"该转的时候没转""不该转的时候转了"。</p>
 
   <div class="table-wrap">
     <table id="fhaTable">
@@ -430,113 +437,106 @@ strong{font-weight:600}
         <tr><th data-sort>功能</th><th>失效状态</th><th>主要阶段</th><th>效应</th><th data-sort>严重度</th><th>DAL</th></tr>
       </thead>
       <tbody>
-        <tr><td class="model">提供升力与推力</td><td>≥3 副旋翼单元失效</td><td>全飞行段</td><td>不可控下降</td><td><span class="tag-a">A</span></td><td class="n">A</td></tr>
-        <tr><td class="model">姿态与航迹控制</td><td>飞控输出错误姿态指令</td><td>全飞行段</td><td>失控、进入不可恢复姿态</td><td><span class="tag-a">A</span></td><td class="n">A</td></tr>
-        <tr><td class="model">能源供给</td><td>全机失电 / 电池热失控</td><td>全飞行段</td><td>推力归零、机上有火</td><td><span class="tag-a">A</span></td><td class="n">A</td></tr>
-        <tr><td class="model">分合与锁止</td><td>飞行中误分离 / 未锁到位</td><td>起飞、巡航</td><td>飞行体脱离、坠落</td><td><span class="tag-a">A</span></td><td class="n">A</td></tr>
-        <tr><td class="model">结构完整性</td><td>机臂 / 涵道 / 桨叶空中脱落</td><td>全飞行段</td><td>失衡、二次击伤</td><td><span class="tag-a">A</span></td><td class="n">A</td></tr>
+        <tr><td class="model">构型转换</td><td>短舱卡阻 / 不对称倾转</td><td>转换段</td><td>滚转与俯仰失控、进入不可恢复姿态</td><td><span class="tag-a">A</span></td><td class="n">A</td></tr>
+        <tr><td class="model">升力—推力交接</td><td>转出走廊（过早提桨 / 过晚转平）</td><td>转换段</td><td>升力不足掉高度 / 载荷超限结构受损</td><td><span class="tag-a">A</span></td><td class="n">A</td></tr>
+        <tr><td class="model">姿态与航迹控制</td><td>模式切换中控制律失效</td><td>转换段</td><td>指令与响应错位、失控</td><td><span class="tag-a">A</span></td><td class="n">A</td></tr>
+        <tr><td class="model">结构完整性</td><td>短舱 / 机翼 / 桨叶断裂</td><td>全飞行段</td><td>解体、二次击伤</td><td><span class="tag-a">A</span></td><td class="n">A</td></tr>
+        <tr><td class="model">能源供给</td><td>全部电池组失效 / 母线短路</td><td>全飞行段</td><td>推力归零、机上有火</td><td><span class="tag-a">A</span></td><td class="n">A</td></tr>
         <tr><td class="model">乘员保护</td><td>坠撞中约束失效、座舱溃缩</td><td>迫降、坠撞</td><td>乘员致命伤</td><td><span class="tag-a">A</span></td><td class="n">B</td></tr>
-        <tr><td class="model">导航与定位</td><td>位置 / 姿态源丢失或跳变</td><td>巡航、进近</td><td>偏航、进入受限空域</td><td><span class="tag-b">B</span></td><td class="n">B</td></tr>
+        <tr><td class="model">单旋翼推进</td><td>丢一个螺旋桨 / 一台电机</td><td>全飞行段</td><td>非对称力矩，其余单元补偿</td><td><span class="tag-b">B</span></td><td class="n">B</td></tr>
+        <tr><td class="model">导航与定位</td><td>位置 / 姿态源丢失或跳变</td><td>巡航、进近</td><td>偏航、走廊判断错误</td><td><span class="tag-b">B</span></td><td class="n">B</td></tr>
         <tr><td class="model">通信与数据链</td><td>C2 链路中断</td><td>全飞行段</td><td>失去监视与远程干预</td><td><span class="tag-b">B</span></td><td class="n">B</td></tr>
-        <tr><td class="model">人机接口与操纵</td><td>模式混淆、单杆误输入</td><td>起飞、着陆</td><td>错误机动、触地过载</td><td><span class="tag-b">B</span></td><td class="n">B</td></tr>
-        <tr><td class="model">告警与应急提示</td><td>低电量 / 超限告警漏报</td><td>全飞行段</td><td>错过处置窗口</td><td><span class="tag-c">C</span></td><td class="n">C</td></tr>
+        <tr><td class="model">人机接口</td><td>模式显示误导、转换提示缺失</td><td>转换段</td><td>飞行员误判当前构型</td><td><span class="tag-b">B</span></td><td class="n">B</td></tr>
+        <tr><td class="model">告警与应急</td><td>卡阻告警漏报 / 误报</td><td>转换段</td><td>错过处置窗口</td><td><span class="tag-c">C</span></td><td class="n">C</td></tr>
         <tr><td class="model">显示与状态</td><td>关键参数显示错误</td><td>全飞行段</td><td>判断错误、操作偏差</td><td><span class="tag-c">C</span></td><td class="n">C</td></tr>
       </tbody>
     </table>
   </div>
-  <p class="cap-note">表 4　功能失效状态清单。点表头可按功能名或严重度排序。六条"严重度 A"是这套构型的全部灾难性出口。</p>
+  <p class="cap-note">表 3　功能失效状态清单。点表头可按功能名或严重度排序。前四条是倾转旋翼独有的，也都落在"转换段"。</p>
 
-  <p>这六条里只要有一条是单点失效，10⁻⁹ 当场失守。所以在下一章里，每一条都要被追问一遍：它到底靠几重<b>独立</b>屏障。</p>
+  <p>表里最值得注意的是第一、二条：它们不是"部件坏了"，而是<b>过程走偏了</b>。部件坏了可以靠多装一套解决，过程走偏只能靠包线保护、模式管理和人的判断。</p>
 
   <figure>
     <div class="canvas">
-      <svg viewBox="0 0 860 320" role="img" aria-label="STPA 控制结构：驾驶员、飞控、执行机构与环境">
+      <svg viewBox="0 0 860 330" role="img" aria-label="STPA 控制结构：模式管理、飞控、倾转作动器">
         <defs>
           <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
             <path d="M0 0 L10 5 L0 10 z" fill="#17161a"/>
           </marker>
-          <marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-            <path d="M0 0 L10 5 L0 10 z" fill="#9c2f1f"/>
-          </marker>
         </defs>
         <g fill="#faf8f2" stroke="#17161a" stroke-width="1.2">
-          <rect x="14" y="118" width="126" height="58"/>
-          <rect x="216" y="86" width="168" height="122"/>
-          <rect x="462" y="44" width="150" height="52"/>
-          <rect x="462" y="118" width="150" height="52"/>
-          <rect x="462" y="192" width="150" height="52"/>
-          <rect x="216" y="252" width="168" height="48"/>
+          <rect x="16" y="120" width="128" height="58"/>
+          <rect x="214" y="86" width="164" height="126"/>
+          <rect x="452" y="52" width="160" height="52"/>
+          <rect x="452" y="128" width="160" height="52"/>
+          <rect x="452" y="204" width="160" height="52"/>
+          <rect x="214" y="256" width="164" height="46"/>
         </g>
         <g font-family="var(--serif)" font-size="13" fill="#17161a">
-          <text x="77" y="142" text-anchor="middle">驾驶员</text>
-          <text x="300" y="110" text-anchor="middle">飞控计算机 ×3</text>
-          <text x="537" y="66" text-anchor="middle">6 × 电机 / 电调</text>
-          <text x="537" y="140" text-anchor="middle">分合执行机构</text>
-          <text x="537" y="214" text-anchor="middle">电池 / 配电</text>
-          <text x="300" y="276" text-anchor="middle">传感器</text>
+          <text x="80" y="144" text-anchor="middle">飞行员</text>
+          <text x="296" y="110" text-anchor="middle">飞控 / 模式管理 ×3</text>
+          <text x="532" y="74" text-anchor="middle">倾转作动器</text>
+          <text x="532" y="150" text-anchor="middle">电机 / 逆变器</text>
+          <text x="532" y="226" text-anchor="middle">电池组 ×4（隔离）</text>
+          <text x="296" y="282" text-anchor="middle">空速 / 姿态传感器</text>
         </g>
         <g font-family="var(--mono)" font-size="9.5" fill="#7a746a">
-          <text x="77" y="160" text-anchor="middle">单杆 · 触屏</text>
-          <text x="300" y="128" text-anchor="middle">表决 · 限幅 · 包线保护</text>
-          <text x="300" y="145" text-anchor="middle">模式管理 · 自动着陆</text>
-          <text x="300" y="162" text-anchor="middle">故障隔离与降级</text>
-          <text x="300" y="188" text-anchor="middle" fill="#9c2f1f">软件 / 共模风险点</text>
-          <text x="537" y="84" text-anchor="middle">差动推力控制</text>
-          <text x="537" y="158" text-anchor="middle">锁止 / 到位检测</text>
-          <text x="537" y="232" text-anchor="middle">双通道供电</text>
-          <text x="300" y="294" text-anchor="middle">IMU · GNSS · 气压 · 视觉</text>
+          <text x="80" y="162" text-anchor="middle">侧杆 · 模式选择</text>
+          <text x="296" y="128" text-anchor="middle">转换律 · 包线保护</text>
+          <text x="296" y="145" text-anchor="middle">作动指令 · 故障隔离</text>
+          <text x="296" y="162" text-anchor="middle">模式显示</text>
+          <text x="296" y="190" text-anchor="middle" fill="#9c2f1f">软件 / 共模风险点</text>
+          <text x="532" y="92" text-anchor="middle">短舱角度</text>
+          <text x="532" y="168" text-anchor="middle">转速 / 推力</text>
+          <text x="532" y="244" text-anchor="middle">独立供电路径</text>
+          <text x="296" y="300" text-anchor="middle">空速管 · IMU · GNSS</text>
         </g>
         <g stroke="#17161a" stroke-width="1.1" fill="none" marker-end="url(#ar)">
-          <line x1="140" y1="140" x2="210" y2="140"/>
-          <line x1="384" y1="104" x2="456" y2="78"/>
-          <line x1="384" y1="148" x2="456" y2="144"/>
-          <line x1="384" y1="182" x2="456" y2="212"/>
-          <line x1="300" y1="252" x2="300" y2="212"/>
+          <line x1="144" y1="146" x2="208" y2="146"/>
+          <line x1="378" y1="104" x2="446" y2="80"/>
+          <line x1="378" y1="150" x2="446" y2="150"/>
+          <line x1="378" y1="186" x2="446" y2="220"/>
+          <line x1="296" y1="256" x2="296" y2="216"/>
         </g>
         <g stroke="#17161a" stroke-width="1" fill="none" stroke-dasharray="4 3" marker-end="url(#ar)">
-          <line x1="216" y1="112" x2="146" y2="126"/>
-          <line x1="462" y1="132" x2="390" y2="122"/>
+          <line x1="214" y1="112" x2="150" y2="126"/>
+          <line x1="452" y1="140" x2="384" y2="128"/>
         </g>
         <g font-family="var(--mono)" font-size="9" fill="#7a746a">
-          <text x="176" y="104">控制动作 ↓</text>
-          <text x="120" y="112">反馈 ↑</text>
+          <text x="160" y="112">反馈 ↑</text>
         </g>
       </svg>
     </div>
-    <figcaption><b>图 2</b>STPA 控制结构。驾驶员唯一的操纵入口是"四轴合一"单杆，操纵权限高度集中在一个人和一套映射逻辑上；飞控里的软件共模点，是 2oo3 架构最容易被攻破的地方。</figcaption>
+    <figcaption><b>图 3</b>STPA 控制结构。倾转旋翼多了一个"模式管理"层：飞行员选模式、飞控判包线、作动器执行，三者对"现在处于什么构型"的理解必须一致。</figcaption>
   </figure>
-
-  <p>STPA 的产出不是"哪个部件会坏"，而是"哪个控制行为在什么上下文里变成不安全的"。下表里最要紧的是第二条：分合机构向飞控报告"锁定完成"——如果位置信号在锁舌未到位时就闭合，这条路径从地面直通空中分离。</p>
 
   <div class="table-wrap">
     <table>
       <thead><tr><th>控制器</th><th>控制行为</th><th>类型</th><th>上下文</th><th>后果</th></tr></thead>
       <tbody>
-        <tr><td>驾驶员</td><td>触发分合（分离）</td><td><span class="tag-a">提供错误</span></td><td>已起飞、离地未锁感知</td><td>空中分离，飞行体失去能量与支撑</td></tr>
-        <tr><td>分合机构</td><td>报告"锁定完成"</td><td><span class="tag-a">时机过早</span></td><td>锁舌未完全到位但微动开关已闭合</td><td>带载起飞，锁止失效</td></tr>
-        <tr><td>飞控</td><td>低电量触发返航 / 迫降</td><td><span class="tag-b">未提供</span></td><td>剩余电量估算偏差、低温掉容</td><td>能量耗尽后无控坠落</td></tr>
-        <tr><td>飞控</td><td>姿态指令输出</td><td><span class="tag-a">提供错误</span></td><td>单套 IMU 故障且表决逻辑误信</td><td>错误机动、进入不可恢复姿态</td></tr>
-        <tr><td>驾驶员</td><td>接管操纵</td><td><span class="tag-b">时机过晚</span></td><td>告警优先级不明确、注意力在外部</td><td>错过 3–5 秒处置窗口</td></tr>
-        <tr><td>飞控</td><td>自动着陆</td><td><span class="tag-b">提供错误</span></td><td>侧风 / 下沉气流超出设计包线仍执行</td><td>重着陆、触地过载超限</td></tr>
-        <tr><td>BMS</td><td>热失控告警</td><td><span class="tag-a">时机过晚</span></td><td>单体内短路、传感点远离热源</td><td>告警时已不可抑制</td></tr>
-        <tr><td>地面保障</td><td>飞行前参数复位</td><td><span class="tag-b">未提供</span></td><td>维修后配平 / 限值沿用上一架次</td><td>首飞即处于异常状态</td></tr>
+        <tr><td>飞行员</td><td>提前进入转换</td><td><span class="tag-a">时机过早</span></td><td>空速未达下边界、高度不足</td><td>升力不足，掉高度</td></tr>
+        <tr><td>飞控</td><td>抑制转换指令</td><td><span class="tag-b">未提供</span></td><td>空速信号故障、包线判断错误</td><td>错过窗口，或误入走廊</td></tr>
+        <tr><td>倾转作动器</td><td>短舱倾转</td><td><span class="tag-a">提供错误</span></td><td>单侧卡阻、两侧不同步</td><td>滚转力矩不平衡、失控</td></tr>
+        <tr><td>作动器</td><td>返回"到位"信号</td><td><span class="tag-a">时机过早</span></td><td>行程开关早闭，实际未到位</td><td>飞控按已到位继续加速</td></tr>
+        <tr><td>模式管理</td><td>模式切换</td><td><span class="tag-a">提供错误</span></td><td>传感器跳变导致模式误判</td><td>控制律与构型不匹配</td></tr>
+        <tr><td>飞行员</td><td>接管操纵</td><td><span class="tag-b">时机过晚</span></td><td>注意力在外部、告警优先级不清</td><td>错过 3–5 秒处置窗口</td></tr>
+        <tr><td>电池管理</td><td>隔离故障电池组</td><td><span class="tag-b">未提供</span></td><td>单体热失控、母线保护未动作</td><td>剩余功率不足，无法完成转换</td></tr>
+        <tr><td>地面保障</td><td>飞行前构型确认</td><td><span class="tag-b">未提供</span></td><td>维修后短舱限位未复位</td><td>首飞即处于异常构型</td></tr>
       </tbody>
     </table>
   </div>
-  <p class="cap-note">表 5　不安全控制行为（UCA）。"类型"沿用 STPA 的四分法：未提供、提供错误、时机过早/过晚、持续时间错误。</p>
-
-  <p>这张表还说明另一件事：<b>把操纵简化成单杆，降低了学习门槛，却把"模式理解"的负担集中到了一个人身上</b>。低空失控时，以 50 米高度、3 米每秒下降率估算，触地前约 16 秒；扣掉感知、判断、动作，真正可用的决策时间不到 10 秒。</p>
+  <p class="cap-note">表 4　不安全控制行为（UCA）。前两条是倾转构型独有的：转换的"时机"本身就是控制对象。</p>
 </section>
 
 <section id="s5">
   <h2><span class="num">05</span>因果与定量</h2>
   <div class="sub">Causal analysis &amp; quantitative budget</div>
 
-  <p>把上一章六条"严重度 A"画成故障树，逐条追问：它靠几重独立屏障。先说结论——独立失效那一支小到可以忽略，真正吃掉预算的是单点与共因。</p>
+  <p>把"转换段丧失控制"画成故障树，会看到一件很不舒服的事：这条树里最粗的一支是<b>单点</b>——倾转作动器卡阻。它不需要两个故障同时发生，一个就够。</p>
 
   <figure>
     <div class="canvas">
-      <svg viewBox="0 0 880 300" role="img" aria-label="X3-F 丧失可控推力的故障树">
+      <svg viewBox="0 0 880 300" role="img" aria-label="转换段丧失控制的故障树">
         <defs>
           <marker id="ar3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
             <path d="M0 0 L10 5 L0 10 z" fill="#7a746a"/>
@@ -546,10 +546,10 @@ strong{font-weight:600}
           <rect x="310" y="8" width="260" height="50"/>
         </g>
         <g font-family="var(--serif)" font-size="13.5" fill="#17161a">
-          <text x="440" y="30" text-anchor="middle">飞行中丧失可控推力 / 失控</text>
+          <text x="440" y="30" text-anchor="middle">转换段丧失控制</text>
         </g>
         <g font-family="var(--mono)" font-size="9" fill="#7a746a">
-          <text x="440" y="48" text-anchor="middle">TOP EVENT · 全部灾难性路径的汇聚点</text>
+          <text x="440" y="48" text-anchor="middle">TOP EVENT · 倾转构型独有的汇聚点</text>
         </g>
 
         <path d="M420 66 Q440 92 460 66 Z" fill="none" stroke="#17161a" stroke-width="1.2"/>
@@ -563,98 +563,87 @@ strong{font-weight:600}
         <line x1="760" y1="108" x2="760" y2="124" stroke="#7a746a" stroke-width="1" marker-end="url(#ar3)"/>
 
         <g fill="#faf8f2" stroke="#17161a" stroke-width="1.1">
-          <rect x="24" y="126" width="192" height="86"/>
-          <rect x="237" y="126" width="192" height="86"/>
-          <rect x="451" y="126" width="192" height="86"/>
-          <rect x="664" y="126" width="192" height="86"/>
+          <rect x="24" y="126" width="192" height="88"/>
+          <rect x="237" y="126" width="192" height="88"/>
+          <rect x="451" y="126" width="192" height="88"/>
+          <rect x="664" y="126" width="192" height="88"/>
         </g>
         <g font-family="var(--serif)" font-size="12.5" fill="#17161a">
-          <text x="120" y="150" text-anchor="middle">推力单元失效 ≥3/6</text>
-          <text x="333" y="150" text-anchor="middle">能源丧失</text>
-          <text x="547" y="150" text-anchor="middle">飞控失效</text>
-          <text x="760" y="150" text-anchor="middle">结构与涵道失效</text>
+          <text x="120" y="150" text-anchor="middle">作动器卡阻</text>
+          <text x="333" y="150" text-anchor="middle">两侧不同步</text>
+          <text x="547" y="150" text-anchor="middle">控制律切换失败</text>
+          <text x="760" y="150" text-anchor="middle">气动干扰 / 结构</text>
         </g>
         <g font-family="var(--mono)" font-size="9" fill="#7a746a">
-          <text x="120" y="168" text-anchor="middle">AND · 独立假设</text>
-          <text x="333" y="168" text-anchor="middle" fill="#9c2f1f">OR · 单点 / 共因</text>
-          <text x="547" y="168" text-anchor="middle">2oo3 ＋ 共因 β</text>
-          <text x="760" y="168" text-anchor="middle">OR · 疲劳 / 异物</text>
+          <text x="120" y="168" text-anchor="middle" fill="#9c2f1f">单点 · 无表决可救</text>
+          <text x="333" y="168" text-anchor="middle">AND · 两侧同时</text>
+          <text x="547" y="168" text-anchor="middle">软件 / 传感器</text>
+          <text x="760" y="168" text-anchor="middle">旋翼—机翼干扰</text>
         </g>
         <g font-family="var(--mono)" font-size="11.5">
-          <text x="120" y="190" text-anchor="middle" fill="#1f4d3f">2.5×10⁻¹²</text>
-          <text x="333" y="190" text-anchor="middle" fill="#9c2f1f">10⁻⁶ → 10⁻⁷</text>
-          <text x="547" y="190" text-anchor="middle" fill="#9c2f1f">2.0×10⁻⁶</text>
+          <text x="120" y="190" text-anchor="middle" fill="#9c2f1f">λ(1−c) ＋ βλ</text>
+          <text x="333" y="190" text-anchor="middle" fill="#1f4d3f">2λ² ≈ 2×10⁻¹⁰</text>
+          <text x="547" y="190" text-anchor="middle" fill="#a8641a">推定 10⁻⁸</text>
           <text x="760" y="190" text-anchor="middle" fill="#a8641a">推定 10⁻⁷</text>
         </g>
         <g font-family="var(--mono)" font-size="8.5" fill="#7a746a">
-          <text x="120" y="204" text-anchor="middle">2 副失效仍可控的推论</text>
-          <text x="333" y="204" text-anchor="middle">电池热失控 / 母线短路</text>
-          <text x="547" y="204" text-anchor="middle">β=0.02 时的示例量级</text>
-          <text x="760" y="204" text-anchor="middle">机臂 / 桨叶 / 涵道</text>
+          <text x="120" y="204" text-anchor="middle">需要第二条独立作动路径</text>
+          <text x="333" y="204" text-anchor="middle">双侧驱动不同源时才成立</text>
+          <text x="547" y="204" text-anchor="middle">模式管理 / 控制律</text>
+          <text x="760" y="204" text-anchor="middle">短舱尾流、机翼载荷</text>
         </g>
         <g font-family="var(--mono)" font-size="9" fill="#7a746a">
-          <text x="24" y="240">目标 10⁻⁹ / 飞行小时　·　四支合计 2.1×10⁻⁶　·　缺口三个数量级</text>
+          <text x="24" y="244">目标 10⁻⁹ / 飞行小时　·　按示例参数合计 ≈3×10⁻⁷（c=99%，β=0.02）　·　缺口两个数量级</text>
         </g>
       </svg>
     </div>
-    <figcaption><b>图 3</b>丧失可控推力故障树（剪枝到四条主支）。数值为按公开构型与假设参数推算的量级演示，不是 X3-F 的实测数据。</figcaption>
+    <figcaption><b>图 4</b>转换段丧失控制的故障树（剪枝到四条主支）。和"六轴六桨"不同，倾转旋翼的核心风险是单点，不是多单元同时失效。</figcaption>
   </figure>
 
-  <h3>两个公式</h3>
+  <h3>为什么这一支是单点</h3>
 
-  <p>六轴六桨、2 副失效仍可控，意味着需要 3 副同时失效才失控。独立假设下这是一个二项分布问题：</p>
-
-  <div class="formula">
-    <div class="eq">P(≥3) = Σ<sub>k=3..6</sub> C(6,k) · λ<sup>k</sup> · (1−λ)<sup>6−k</sup>　≈　20λ³</div>
-    <div class="where">
-      <var>λ</var>　单个推力单元（电机＋电调＋桨＋驱动）的失效率，取 5×10⁻⁵／小时<br>
-      结果　λ=5×10⁻⁵ 时约 2.5×10⁻¹²，比目标低三个数量级
-    </div>
-  </div>
-
-  <p>但飞控是 2oo3（三取二），它的失效率不是三次方那么小——独立项是 3λ²，而共因项是 βλ。β 是"共因失效占总失效率的比例"：</p>
+  <p>多旋翼的灾难性事件需要"多个单元同时失效"，概率是 λ 的三次方；倾转旋翼不需要——一副作动器卡住，两侧短舱角就不同步，滚转力矩立刻出现。要把它变成"两个同时失效"，必须给每侧装<b>两套独立的作动路径</b>（不同源、不同供电、最好不同原理），这才谈得上 2λ²。</p>
 
   <div class="formula">
-    <div class="eq">P<sub>飞控</sub> = 3λ<sup>2</sup> ＋ βλ　　（λ 为单套飞控失效率）</div>
+    <div class="eq">P<sub>转换段</sub> = λ<sub>a</sub>(1 − <var>c</var>) ＋ βλ<sub>a</sub></div>
     <div class="where">
-      <var>β</var>　同一套软件、同一路电源、同一个供应商带来的相关性；工程上常落在 10⁻² ~ 10⁻⁴<br>
-      注意　β 不能靠"多装一套"降低，只能靠相异设计与独立性论证
+      <var>λ<sub>a</sub></var>　单套倾转作动器的卡阻率（含检测不到的卡阻）<br>
+      <var>c</var>　　检测并完成重构的覆盖率：发现卡阻、隔离该侧、用另一侧与剩余推力维持可控<br>
+      <var>β</var>　　共因比例：同一路液压 / 电源 / 软件导致的"两套一起失效"<br>
+      说明　c 不够高时，公式退化成 λ<sub>a</sub>——这就是单点的含义
     </div>
   </div>
-
-  <p>下面这个调节器可以同时拖动两个参数，看预算怎么被吃掉。默认值是我按公开构型取的示例假设：单套飞控 10⁻⁴／小时，共因比例 0.02。</p>
 
   <div class="calc">
-    <div class="calc-head"><span>预算调节器 · <b>按严重度 A 的 10⁻⁹ 总预算分账</b></span><span>BUDGET CALCULATOR</span></div>
+    <div class="calc-head"><span>转换段预算调节器 · <b>按 10⁻⁹ 的总预算分账</b></span><span>TRANSITION BUDGET</span></div>
     <div class="calc-body">
       <div class="calc-in">
         <div class="field">
-          <label>单套飞控失效率 λ <output id="outLam">1.0×10⁻⁴</output></label>
-          <input type="range" id="lam" min="0" max="100" value="33">
+          <label><span>作动器卡阻率 λ<sub>a</sub></span><output id="outLam">1.0×10⁻⁵</output></label>
+          <input type="range" id="lam" min="0" max="100" value="50">
         </div>
         <div class="field">
-          <label>共因比例 β <output id="outBeta">0.0200</output></label>
+          <label><span>检测与重构覆盖率 c</span><output id="outCov">99.0%</output></label>
+          <input type="range" id="cov" min="0" max="100" value="50">
+        </div>
+        <div class="field">
+          <label><span>共因比例 β</span><output id="outBeta">0.0200</output></label>
           <input type="range" id="beta" min="0" max="100" value="89">
         </div>
-        <div class="field">
-          <label>电池单点失效率 <output id="outBat">1.0×10⁻⁶</output></label>
-          <input type="range" id="bat" min="0" max="100" value="50">
-        </div>
-        <p class="small" style="margin:4px 0 0">三个滑杆都是对数刻度。左侧为示例假设，不是 X3-F 的实测值。</p>
+        <p class="small" style="margin:4px 0 0">三个滑杆都是对数/非线性刻度。左侧为示例假设，不是 S4 的实测值。</p>
       </div>
       <div class="calc-out">
-        <div class="readout"><span>2oo3 独立项 3λ²</span><b id="rInd">3.0×10⁻⁸</b></div>
-        <div class="readout"><span>共因项 βλ</span><b id="rCc">2.0×10⁻⁶</b></div>
-        <div class="readout"><span>飞控合计</span><b id="rSum">2.0×10⁻⁶</b></div>
-        <div class="readout"><span>电池（缓解 90% 后）</span><b id="rBat">1.0×10⁻⁷</b></div>
-        <div class="readout hi"><span>整机合计 / 目标倍数</span><b id="rTot">2.1×10⁻⁶ ×2 100</b></div>
+        <div class="readout"><span>单点残余 λ(1−c)</span><b id="rInd">1.0×10⁻⁷</b></div>
+        <div class="readout"><span>共因项 βλ</span><b id="rCc">2.0×10⁻⁷</b></div>
+        <div class="readout"><span>转换段合计</span><b id="rSum">3.0×10⁻⁷</b></div>
+        <div class="readout hi"><span>相对 10⁻⁹ 目标</span><b id="rTot">×300</b></div>
         <div class="verdict" id="verdict"></div>
       </div>
     </div>
-    <div class="calc-foot">算法：飞控 = 3λ² + βλ；电池 = 单点 × (1−缓解率)；整机 = 飞控 + 电池 + 推力单元。缓解率固定 90%。全部为量级演示。</div>
+    <div class="calc-foot">算法：P = λ(1−c) + βλ。覆盖率 c 按 1−10^(−值/25) 映射；λ 取 10^(−6+值/50)；β 取 10^(−5+值/100×3.699)。纯量级演示。</div>
   </div>
 
-  <p>拖到 β=10⁻⁵ 时，共因项会掉到 10⁻⁹，但合计仍停在 3×10⁻⁸——因为独立项 3λ² 与 β 无关。这就是定量目标倒逼出的真正门槛：<b>单套设备本身要可靠到 10⁻⁵ 量级</b>，否则再怎么"三取二"，预算也回不到 10⁻⁹。</p>
+  <p>拖覆盖率那个滑杆最能说明问题：把 c 从 99% 推到 99.9%，单点残余降一个数量级；但只要 β 还在 10⁻²，共因项就横在那里不动。<b>倾转旋翼的安全，一半在"能不能发现并重构"，另一半在"两套作动是不是真的两套"。</b></p>
 
   <h3>共因清单</h3>
 
@@ -662,16 +651,16 @@ strong{font-weight:600}
     <table>
       <thead><tr><th>共因源</th><th>波及的"冗余"</th><th>为什么危险</th><th>可用的独立性论据</th></tr></thead>
       <tbody>
-        <tr><td class="model">电池包 / 母线</td><td>动力 2 套、供电 2 套在物理上共用</td><td>"两套供电"若最终汇到同一电池包，等于一套</td><td>物理隔离 + 独立熔断 + 分区热障</td></tr>
-        <tr><td class="model">飞控软件同源</td><td>飞控 3 套</td><td>同一份代码的同一种缺陷，三套同时触发</td><td>相异软件、独立开发团队与工具链</td></tr>
-        <tr><td class="model">共模电源 / 时钟</td><td>3 套飞控的供电与同步</td><td>单点电源故障拉垮全部通道</td><td>独立电源与独立时钟、交叉通道比较</td></tr>
-        <tr><td class="model">GNSS 拒止 / 干扰</td><td>导航、通信、感知</td><td>单一星座与单一频点被压制</td><td>多星座 + 惯导 + 视觉 / 激光备份</td></tr>
-        <tr><td class="model">涵道结冰 / 异物</td><td>同侧多副旋翼</td><td>同一气流通道内的单元同时受损</td><td>分区设计 + 防冰除冰 + FOD 防护</td></tr>
-        <tr><td class="model">维修与地面差错</td><td>全机</td><td>一次错误的参数复位影响所有通道</td><td>双人复核 + 自检 + 飞行前 BIT</td></tr>
+        <tr><td class="model">作动器同源</td><td>左右两侧倾转作动</td><td>同一型号、同一供应商、同一批密封件，同寿命失效</td><td>相异原理（电作动 vs 液压）、不同供应商、独立供电</td></tr>
+        <tr><td class="model">双电机共逆变器</td><td>每桨两台电机</td><td>若两台电机共用一路逆变器，"双电机"只抗单点，不抗共因</td><td>每台电机独立逆变器 + 独立电池组</td></tr>
+        <tr><td class="model">电池组汇流</td><td>四组隔离电池</td><td>四组若汇到同一母线，隔离只剩名义</td><td>独立母线与熔断、物理分隔与热障</td></tr>
+        <tr><td class="model">飞控软件同源</td><td>三套飞控</td><td>同一份代码的同一种缺陷，三套同时触发</td><td>相异软件、独立开发团队与工具链</td></tr>
+        <tr><td class="model">空速/姿态共模</td><td>转换判据</td><td>空速管堵塞或 IMU 漂移，会同时误导三套飞控</td><td>多源空速（动压 + GPS + 迎角）、独立 IMU</td></tr>
+        <tr><td class="model">旋翼—机翼干扰</td><td>同一侧多副旋翼</td><td>转换时旋翼尾流打在机翼上，同侧载荷同时变化</td><td>风洞与试飞包线、结构裕度、主动限幅</td></tr>
       </tbody>
     </table>
   </div>
-  <p class="cap-note">表 6　共因清单。每一行都对应一条"看起来有两套、实际只有一套"的隐蔽路径。</p>
+  <p class="cap-note">表 5　共因清单。前两行是倾转构型特有的：真正的冗余要一直做到"作动路径"和"逆变器"这一层。</p>
 
   <h3>关键件失效模式</h3>
 
@@ -679,100 +668,90 @@ strong{font-weight:600}
     <table>
       <thead><tr><th>部件</th><th>失效模式</th><th>局部影响</th><th>上层影响</th><th>探测</th><th>缓解</th></tr></thead>
       <tbody>
-        <tr><td class="model">电机 / 电调</td><td>堵转、退磁、驱动管短路</td><td>单副推力丧失</td><td>差动补偿，≥3 副时失控</td><td>转速 / 电流 / 温度监控</td><td>过流保护、单元隔离、推力裕度</td></tr>
-        <tr><td class="model">电池模组</td><td>内短路、热失控、连接件熔断</td><td>容量骤降、起火</td><td>全机失能</td><td>单体温升、电压差、气体传感</td><td>热障、泄压、熔断、独立舱</td></tr>
-        <tr><td class="model">飞控计算机</td><td>输出卡死、位翻转、看门狗失效</td><td>单通道失效</td><td>表决降级，双故障即失控</td><td>交叉通道比较、心跳</td><td>2oo3 表决、相异软件、独立供电</td></tr>
-        <tr><td class="model">分合锁</td><td>未锁到位、误开锁、疲劳裂纹</td><td>接口松动</td><td>空中分离 / 地面脱落</td><td>位置 + 载荷双确认</td><td>双余度锁、飞行中互锁、寿命试验</td></tr>
-        <tr><td class="model">桨叶 / 涵道</td><td>裂纹、脱层、异物打伤</td><td>推力不平衡、振动</td><td>结构失效、二次击伤</td><td>振动谱、目视 / 超声检查</td><td>包容性设计、损伤容限、定期检查</td></tr>
-        <tr><td class="model">线束 / 连接器</td><td>磨损、进水、接触不良</td><td>间歇性断电</td><td>通道随机失效，难复现</td><td>绝缘监测、导通自检</td><td>双路布线、物理分隔、防呆</td></tr>
+        <tr><td class="model">倾转作动器</td><td>卡阻、爬行、行程漂移</td><td>短舱角不同步</td><td>滚转失衡，转换段失控</td><td>角度反馈、电流、同步比较</td><td>双路径、相异原理、限幅与降级</td></tr>
+        <tr><td class="model">电机 / 逆变器</td><td>退磁、驱动管短路</td><td>单桨推力丧失</td><td>非对称力矩，其余单元补偿</td><td>转速 / 电流 / 温度</td><td>每桨双电机、独立逆变器</td></tr>
+        <tr><td class="model">电池组</td><td>内短路、连接件熔断</td><td>单组容量丧失</td><td>功率裕度下降，转换能力受限</td><td>单体电压、温差、气体</td><td>四组隔离、熔断、热障</td></tr>
+        <tr><td class="model">飞控</td><td>输出卡死、模式误判</td><td>单通道失效</td><td>表决降级，双故障即失控</td><td>交叉比较、心跳</td><td>2oo3、相异软件</td></tr>
+        <tr><td class="model">短舱 / 机翼</td><td>疲劳裂纹、雷击损伤</td><td>局部刚度下降</td><td>颤振、结构失效</td><td>应变 / 振动监测、目视</td><td>损伤容限、检查大纲</td></tr>
+        <tr><td class="model">空速系统</td><td>堵塞、结冰、加热失效</td><td>空速读数错误</td><td>转换判据错误，提前或滞后转换</td><td>多源比对、一致性检查</td><td>冗余空速源、包线保护、结冰包线</td></tr>
       </tbody>
     </table>
   </div>
-  <p class="cap-note">表 7　关键件 FMEA（节选）。价值不在表格本身，而在"探测"一列——凡是只能靠人眼在飞行前发现的失效，本质上都还是运行风险，不是设计已关闭的风险。</p>
+  <p class="cap-note">表 6　关键件 FMEA（节选）。"探测"一列决定这条失效是设计关闭的还是运行兜底的。</p>
 </section>
+
 <section id="s6">
   <h2><span class="num">06</span>关键子系统</h2>
   <div class="sub">Subsystem safety</div>
 
-  <p>同一套"冗余"话术套不到所有子系统上。电池要的是<b>包容</b>，推力要的是<b>裕度</b>，飞控要的是<b>独立性</b>，分合要的是<b>互锁</b>，结构要的是<b>吸能</b>，软件要的是<b>确定性</b>，人因要的是<b>时间</b>。</p>
+  <p>倾转旋翼的安全，六个子系统各管一段：作动器管"转得动"，推进管"推得够"，飞控管"转得对"，气动管"转得稳"，能源管"转得起"，人因管"来得及"。</p>
 
   <div class="tabs" role="tablist">
-    <button role="tab" aria-selected="true" data-panel="p-bat">电池 / 热失控</button>
-    <button role="tab" aria-selected="false" data-panel="p-dep">电推进 / 涵道</button>
-    <button role="tab" aria-selected="false" data-panel="p-fcs">飞控 / 作动</button>
-    <button role="tab" aria-selected="false" data-panel="p-dock">分合机构</button>
-    <button role="tab" aria-selected="false" data-panel="p-str">结构 / 坠撞</button>
-    <button role="tab" aria-selected="false" data-panel="p-sw">软件 / 感知</button>
-    <button role="tab" aria-selected="false" data-panel="p-hf">人因 / 训练</button>
+    <button role="tab" aria-selected="true" data-panel="p-act">倾转作动</button>
+    <button role="tab" aria-selected="false" data-panel="p-dep">推进与配电</button>
+    <button role="tab" aria-selected="false" data-panel="p-fcs">飞控与模式</button>
+    <button role="tab" aria-selected="false" data-panel="p-aero">气动与结构</button>
+    <button role="tab" aria-selected="false" data-panel="p-bat">能源与热</button>
+    <button role="tab" aria-selected="false" data-panel="p-hf">人因与训练</button>
   </div>
 
-  <div class="panel on" id="p-bat">
-    <h4>电池：要论证的不是"不着火"，而是"蔓延不可达"</h4>
+  <div class="panel on" id="p-act">
+    <h4>倾转作动：全机唯一"坏了就没救"的机械件</h4>
     <dl>
-      <dt>链条</dt><dd>单体内部短路 → 产气升温 → 泄压喷发 → 相邻单体被加热 → 模组连锁 → 母线失电 → 推力归零。真正要论证的是蔓延不可达，以及失去一部分容量后仍能安全降落。</dd>
-      <dt>标尺</dt><dd class="bad">车规 GB 38031 的热扩散要求是给乘员留出逃生时间；航空的逻辑是失效后仍须保持可控飞行与着陆能力。同样的电芯，在航空上需要更强的分区、熔断与独立供电。</dd>
-      <dt>季节</dt><dd class="bad">−10 ℃ 下可用容量与放电功率同时下降，"满电 6 次飞行"的承诺在冬季会打折。返航裕度若按常温标定，冬季会出现"计划内却回不来"的运行风险。</dd>
-      <dt>证据</dt><dd>公开信息中未见电芯滥用试验（针刺 / 过充 / 热箱）与包级蔓延试验的结论，只有"安全冗余"的表述。</dd>
+      <dt>职责</dt><dd>驱动短舱在 90°（悬停）与 0°（巡航）之间连续倾转，两侧同步误差要在很小的范围内。它同时承受气动载荷、惯性载荷与结构预紧。</dd>
+      <dt>单点</dt><dd class="bad">作动器卡阻不需要第二个故障配合：一侧卡住，另一侧继续转，滚转力矩立刻出现。这是故障树里最粗的那一支，也是"多装电机"救不了的地方。</dd>
+      <dt>解法</dt><dd class="good">每侧两条独立作动路径，最好不同原理（电作动 + 液压/机电备份），独立供电、独立控制通道；再加同步比较与限幅，卡阻时把两侧都锁在当前角度而不是继续追指令。</dd>
+      <dt>证据</dt><dd>需要卡阻故障注入试验、双路径切换试验、寿命与磨损试验。公开信息中未见这类数据。</dd>
     </dl>
   </div>
 
   <div class="panel" id="p-dep">
-    <h4>电推进：推重比 &gt;2 不是性能指标，是失效预算</h4>
+    <h4>推进与配电：冗余做到了电机级，但要看隔离是不是真的</h4>
     <dl>
-      <dt>裕度</dt><dd class="good">悬停只需推重比 1.0，余下的部分用来做机动、抗风，以及补偿失效单元。厂商公开"2 副旋翼失效仍可控"，等价于要求 ≥3 副同时失效才失控——这是图 3 那条 10⁻¹² 的来源。</dd>
-      <dt>涵道</dt><dd>涵道把桨叶包起来，降低了桨叶断裂飞出与地面人员误触的风险，也压低了高频噪声；代价是结构重量、前飞阻力，以及结冰与异物更容易在通道内积聚。</dd>
-      <dt>非对称</dt><dd class="bad">对角失效可以用剩余单元配平；同侧失效会同时损失滚转与俯仰的控制权限。真正需要专项验证的是最不利组合，而不是"任意两副"这句话。</dd>
-      <dt>环境</dt><dd class="bad">空气密度下降直接降低推力，散热条件同时变差。标称的 360 km/h、500 km 与"2 副失效可控"，都不必然在 40 ℃、2000 米条件下成立。</dd>
+      <dt>架构</dt><dd class="good">以公开的 S4 为例：六个倾转螺旋桨（四个在机翼、两个在 V 尾），每个桨两台电机，每台电机两路逆变器，每路逆变器接到独立的电池组，全机四组隔离电池；丢任意一个螺旋桨仍能安全飞行（厂商口径）。</dd>
+      <dt>要害</dt><dd class="bad">这套架构抗的是"单元失效"，不是"共因失效"。如果两台电机共用一路逆变器、四组电池汇到同一母线，纸面上的冗余就只剩一半。</dd>
+      <dt>转换段</dt><dd class="bad">转换时功率需求最高：悬停要推力，加速要功率，倾转还要克服短舱气动载荷。功率裕度不足时，最先牺牲的就是转换能力。</dd>
+      <dt>证据</dt><dd>单桨失效试飞有公开表述；双电机/双逆变器/四电池的独立性证据（接线拓扑、故障隔离试验）未见公开。</dd>
     </dl>
   </div>
 
   <div class="panel" id="p-fcs">
-    <h4>飞控：3 套不是"三保险"，是"两重容错"</h4>
+    <h4>飞控与模式：三套电传，管的是"构型一致性"</h4>
     <dl>
-      <dt>架构</dt><dd>2oo3 表决在单通道失效后降为 2oo2——此时已不具备容错能力，必须限制继续飞行。所以"3 套"的正确表述是：能容忍一次故障，第二次故障就是危险状态。</dd>
-      <dt>软肋</dt><dd class="bad">如果三套跑同一份软件、共用一路电源与一个时钟，那它们在共因面前是一套。DAL A 级别的独立性需要相异软件、独立供电、独立时钟与交叉比较，且要有 CCA 证据——这些都不在公开资料里。</dd>
-      <dt>控制</dt><dd>六轴六桨靠转速差产生力矩，没有舵面，控制带宽受电机响应与桨叶惯量限制。姿态控制权限在低转速段最弱，这决定了它不能像直升机那样做大机动。</dd>
-      <dt>包线</dt><dd class="bad">包线保护能防止驾驶员把飞机飞进不可恢复状态；但保护逻辑在传感器故障时会"锁定"错误姿态。保护越强，对传感器可信度的依赖越深。</dd>
+      <dt>架构</dt><dd>公开信息称 S4 有三套电传飞控计算机，模式由飞控统一管理：飞行员给意图，飞控判断包线、决定什么时候允许转换。</dd>
+      <dt>核心</dt><dd class="bad">倾转旋翼的控制律不是一套，而是按构型分段的：悬停律、转换律、巡航律。切换点上的连续性、权限交接、以及"当前该用哪套"的判断，才是失效高发区。</dd>
+      <dt>包线</dt><dd class="good">包线保护能阻止飞行员把飞机推进走廊之外；但保护逻辑依赖空速与姿态的可信度——传感器共模会同时误导三套飞控。</dd>
+      <dt>证据</dt><dd>DO-178C DAL A 的覆盖与独立性证据、转换律的台架与铁鸟试验，公开信息中没有。</dd>
     </dl>
   </div>
 
-  <div class="panel" id="p-dock">
-    <h4>分合机构：全机唯一必须"想开就开、想锁就锁"的部件</h4>
+  <div class="panel" id="p-aero">
+    <h4>气动与结构：转换段的气动干扰是真实的工程难点</h4>
     <dl>
-      <dt>职责</dt><dd>地面要可靠解锁、空中要绝对锁死，两种相反要求压在同一套机构上。常见做法是双余度锁 + 位置与载荷双确认 + 飞控内互锁，且互锁优先级高于任何人工指令。</dd>
-      <dt>误报</dt><dd class="bad">微动开关类"到位信号"在振动、结冰、异物下容易早闭。若软件把"信号闭合"直接当"锁定完成"，就形成一条从地面直通空中分离的路径。</dd>
-      <dt>证据</dt><dd>至少需要 FMEA、CCA、寿命与疲劳试验、误操作试验四类。这是适航上的全新对象，没有现成条款可依。</dd>
-      <dt>地面</dt><dd class="bad">装载后整车质心显著上移、侧风面积增大。急弯、侧风、紧急制动下的侧翻风险属于车规范畴，却由航空部件引起，正好落在两套体系的缝里。</dd>
+      <dt>干扰</dt><dd class="bad">旋翼尾流在转换过程中会扫过机翼与尾翼，升力、俯仰力矩、抖振同时变化；公开综述指出，有机翼构型（倾转与复合翼）在模式转换时的气动干扰比多旋翼严重得多。</dd>
+      <dt>载荷</dt><dd class="bad">走廊上边界本质是载荷边界：短舱、机翼前缘、连接件在转换中承受交变载荷，疲劳寿命按"每次转换"累计，而不是按飞行小时。</dd>
+      <dt>材料</dt><dd>复材比强度高，但抗冲击与吸能不如金属；雷击防护、胶接质量、孔隙率都是适航关注点。</dd>
+      <dt>证据</dt><dd>风洞与试飞包线数据、疲劳试验、雷击试验——公开信息只有"已开展"的表述。</dd>
     </dl>
   </div>
 
-  <div class="panel" id="p-str">
-    <h4>结构：坠撞生存性要按"可生存但机体损毁"设计</h4>
+  <div class="panel" id="p-bat">
+    <h4>能源与热：转换段是功率峰值，也是热峰值</h4>
     <dl>
-      <dt>准则</dt><dd>通航常见的坠撞准则量级是 7–9 m/s 垂直速度（约 25–30 ft/s，推定）：座椅、约束、起落架与机身压溃段共同吸收能量，目标是保住座舱容积，而不是保住飞机。</dd>
-      <dt>材料</dt><dd class="bad">复合材料比强度高，压溃时却是脆性断裂、吸能效率低且难预测。坠撞设计常要专门的吸能结构（金属蜂窝、可压溃管），不能只靠机身本体。</dd>
-      <dt>出口</dt><dd class="bad">坠撞后舱门变形、倒扣、落水是三个独立场景。没有弹射座椅（也基本不可能有），唯一的冗余是"整机伞 + 抗坠撞结构 + 快速离机"三者叠加。</dd>
-      <dt>伞</dt><dd>汇天公开过"超低空整机多伞救生系统"，并在 X2 上完成 50 m 开伞试验。50 m 自由落体约 3.2 秒，开伞、充气、减速都要在这段时间内完成——有效，但窗口很窄，不能当主要防线。</dd>
-    </dl>
-  </div>
-
-  <div class="panel" id="p-sw">
-    <h4>软件与感知：确定性要靠流程买，不能靠测试堆</h4>
-    <dl>
-      <dt>等级</dt><dd>DAL A 的软件要求 MC/DC 级别的覆盖、独立验证与工具鉴定。把操纵、包线保护、自动着陆写进同一套软件，是审定工作量的大头。</dd>
-      <dt>预期功能</dt><dd class="bad">航空没有 ISO 21448，但有等价物：运行限制 + 包线保护 + 场景验证。差别在于航空更倾向于"禁止进入"，而不是在功能上兜住。</dd>
-      <dt>感知</dt><dd class="bad">低空环境的主要障碍不是汽车，而是电线、塔吊、鸟群与玻璃幕墙反光。毫米波对细线不敏感，视觉对逆光失效——多传感器融合解决的是概率，不是确定性。</dd>
-      <dt>更新</dt><dd class="bad">汽车可以按月 OTA；航空软件更改要重新走审定或按批准的程序管理。产品节奏越快，越容易在这条线上出问题。</dd>
+      <dt>峰值</dt><dd class="bad">悬停与转换叠在一起，是整段航程里功率最高的时刻；电池在高倍率放电时内阻发热，温度又反过来限制输出。</dd>
+      <dt>隔离</dt><dd class="good">四组独立电池组的意义不只是容量：一组失效时，剩下三组仍要能支撑一次安全着陆，而不是"继续完成任务"。</dd>
+      <dt>余量</dt><dd class="bad">SOC 估算误差、低温掉容、电池老化，都会让"计划内够用"变成"实际上不够"。转换是耗电动作，余量必须按最坏情况留。</dd>
+      <dt>证据</dt><dd>电池滥用试验（针刺/过充/热箱）、包级蔓延试验、低温性能数据，公开信息中未见。</dd>
     </dl>
   </div>
 
   <div class="panel" id="p-hf">
-    <h4>人因：低空失控，留给人的时间只有几秒</h4>
+    <h4>人因：转换只有几分钟，人的窗口只有几秒</h4>
     <dl>
-      <dt>窗口</dt><dd class="bad">以 50 m 高度、3 m/s 下降率估算，触地前约 16 秒；扣掉感知、判断、动作，可用决策时间不到 10 秒。这与地面驾驶"看到再踩刹车"完全不是一个量级。</dd>
-      <dt>单杆</dt><dd>把四个通道压成一个直觉映射，新手更快上手；代价是驾驶员看不到单个通道的状态，一旦映射逻辑出错，人的纠错能力被削弱。</dd>
-      <dt>资质</dt><dd class="bad">课程材料指出，现有飞行员执照体系无法完全适配飞行汽车：私照与运动照的训练大纲里没有"分合操作""地面行驶—飞行切换"这些科目。</dd>
-      <dt>乘客</dt><dd class="bad">双座产品的乘客会分散注意力、提问、触碰界面。座舱设计要把"乘客可触及"的范围当成潜在误操作源来处理。</dd>
+      <dt>模式意识</dt><dd class="bad">飞行员必须始终知道"现在是什么构型、下一步该做什么"。模式显示一旦误导，人的纠错能力会被结构性地削弱。</dd>
+      <dt>窗口</dt><dd class="bad">转换段高度低、速度低，出现卡阻后可用处置时间以秒计；而转换本身是一个持续几十秒的过程，注意力分配很难一直锁在模式上。</dd>
+      <dt>训练</dt><dd class="bad">现有执照体系没有"转换段特情"的训练科目，倾转机型的改装训练大纲需要单独设计。</dd>
+      <dt>自动化</dt><dd>把转换交给飞控自动执行能降低操作负荷，但也把"人是否还理解正在发生什么"变成新的风险点。</dd>
     </dl>
   </div>
 </section>
@@ -781,46 +760,45 @@ strong{font-weight:600}
   <h2><span class="num">07</span>运行安全</h2>
   <div class="sub">Operational safety</div>
 
-  <p>适航证只证明"设计在限定条件下安全"，不证明"这一次飞行安全"。运行侧的四件事——起降场、空域、维护、应急——决定实际风险。</p>
+  <p>适航证只证明"设计在限定条件下安全"，不证明"这一次飞行安全"。倾转旋翼的运行侧比多旋翼多出三件事：转换窗口的气象条件、起降场的净空与噪声、以及单点失效后的处置程序。</p>
 
-  <p>下面的矩阵把危害按"可能性 × 严重度"落位。纵轴向上为可能性升高，横轴向右为严重度升高；严重度为 A 的格子一律按红色以上处理，不管乘积多小。点圆点看该条危害的场景、现有屏障与残余风险。</p>
+  <p>下面的矩阵把危害按"可能性 × 严重度"落位。纵轴向上为可能性升高，横轴向右为严重度升高；严重度为 A 的格子一律按红色以上处理。点圆点看该条危害的场景、现有屏障与残余风险。</p>
 
   <div class="matrix">
     <div class="mgrid" id="mgrid"></div>
     <div class="mdetail" id="mdetail"></div>
   </div>
-  <p class="cap-note">图 4　危害风险矩阵（11 条）。风险值 = 可能性 × 严重度，但严重度 A 设了颜色下限，避免"极罕见"把灾难性刷成绿色。</p>
+  <p class="cap-note">图 5　危害风险矩阵（11 条）。风险值 = 可能性 × 严重度，但严重度 A 设了颜色下限，避免"极罕见"把灾难性刷成绿色。底色：浅绿 = 低，浅黄 = 高，粉红 / 深红 = 严重 / 不可接受。</p>
 
   <h3>运行限制：把风险"框"在外面</h3>
-
-  <p>私人娱乐这一档的安全，很大一部分不是靠设计，而是靠运行限制把暴露面收窄：昼间、目视、隔离空域、营地围界。这些限制不是免责声明，它们本身就是安全论证的一部分。</p>
 
   <div class="table-wrap">
     <table>
       <thead><tr><th>限制项</th><th>典型要求（推定）</th><th>为什么必须有</th><th>突破后的后果</th></tr></thead>
       <tbody>
-        <tr><td class="model">昼间目视</td><td>仅昼间、VFR、云底高与能见度达标</td><td>感知与避让依赖人眼，夜间无可靠手段</td><td>空中相撞、误入障碍</td></tr>
-        <tr><td class="model">风速 / 阵风</td><td>起降段风速上限、侧风分量限制</td><td>六轴构型抗风能力有限，余量被失效补偿吃掉</td><td>姿态失控、重着陆</td></tr>
-        <tr><td class="model">空域与航线</td><td>隔离空域、预先申报、避开人口密集区</td><td>第三方地面风险的主要控制手段</td><td>坠撞造成地面伤亡</td></tr>
-        <tr><td class="model">起降场</td><td>净空、安全间距、消防与围界</td><td>起降段是失效最集中的阶段</td><td>伤及地面人员、火灾蔓延</td></tr>
-        <tr><td class="model">维护</td><td>航前 / 航后检查、周期检查、电池健康度</td><td>分合机构与电池是消耗件</td><td>带故障起飞</td></tr>
-        <tr><td class="model">人员资质</td><td>驾驶资质、营地操作员培训</td><td>单驾驶员体系下，人的能力就是最后一道屏障</td><td>误操作、处置失当</td></tr>
+        <tr><td class="model">转换窗口</td><td>只在指定高度与空速带内转换，禁止低空低速提前转</td><td>走廊下边界是可控性，越界即掉高度</td><td>升力不足、不可控下降</td></tr>
+        <tr><td class="model">风速 / 阵风</td><td>转换段与起降段的风速上限、侧风分量限制</td><td>倾转构型在转换中对阵风最敏感</td><td>短舱载荷超限、姿态失控</td></tr>
+        <tr><td class="model">结冰条件</td><td>已知结冰条件下禁飞或限飞</td><td>短舱与桨叶结冰会破坏推力与配平</td><td>推力衰减、失去同步</td></tr>
+        <tr><td class="model">起降场</td><td>净空、安全间距、噪声与围界</td><td>起降段是失效最集中的阶段</td><td>伤及地面人员</td></tr>
+        <tr><td class="model">单点程序</td><td>作动器卡阻、单桨失效的处置程序与高度门槛</td><td>这些失效必须以"可控着陆"为目标，不是"继续任务"</td><td>处置失当、二次损伤</td></tr>
+        <tr><td class="model">维护</td><td>作动器周期检查、同步校准、电池健康度</td><td>卡阻多由磨损与污染积累而来</td><td>带故障起飞</td></tr>
       </tbody>
     </table>
   </div>
-  <p class="cap-note">表 8　运行限制。它们对应的是"剩余风险"，即设计已经尽力、剩下的靠怎么飞来控制的那一部分。</p>
+  <p class="cap-note">表 7　运行限制。对倾转旋翼来说，"转换窗口"这条本身就是安全论证的一部分，而不是操作建议。</p>
 
-  <p>还有一条常被忽略：<b>第三方风险</b>。私人娱乐飞行若发生在营地或景区，地面有非乘员人群。航空的 10⁻⁹ 是对乘员说的，对地面第三方通常另有更严的暴露控制；这条线靠隔离空域与场地围界守，而不是靠冗余。同理，营地火灾与救援响应时间也属于运行安全论证，却极少出现在产品宣传里。</p>
+  <p>还有一条常被忽略：<b>第三方风险</b>。城市空中出租车若在人口密集区上空飞行，地面人员的暴露就不是"极罕见"能兜住的；这条线靠航线规划与隔离空域守，而不是靠冗余。</p>
 </section>
+
 <section id="s8">
   <h2><span class="num">08</span>论证与结论</h2>
   <div class="sub">Assurance &amp; verdict</div>
 
-  <p>安全论证（GSN）的结构是"目标—策略—子目标—证据"。它的价值在于把"我觉得安全"变成"哪条证据支持哪个结论"。下面这张图按这个结构搭，最下面的缺口是目前公开信息里空着的位置。</p>
+  <p>安全论证（GSN）的结构是"目标—策略—子目标—证据"。它的价值在于把"我觉得安全"变成"哪条证据支持哪个结论"。</p>
 
   <figure>
     <div class="canvas">
-      <svg viewBox="0 0 860 400" role="img" aria-label="X3-F 安全论证（GSN）结构">
+      <svg viewBox="0 0 860 400" role="img" aria-label="倾转旋翼安全论证（GSN）结构">
         <defs>
           <marker id="ar4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
             <path d="M0 0 L10 5 L0 10 z" fill="#7a746a"/>
@@ -828,50 +806,50 @@ strong{font-weight:600}
         </defs>
         <g fill="#faf8f2" stroke="#17161a" stroke-width="1.2">
           <rect x="270" y="8" width="320" height="54"/>
-          <rect x="250" y="80" width="360" height="56"/>
-          <rect x="14" y="158" width="262" height="54"/>
-          <rect x="299" y="158" width="262" height="54"/>
-          <rect x="584" y="158" width="262" height="54"/>
-          <rect x="14" y="244" width="262" height="46" stroke-dasharray="4 3"/>
-          <rect x="299" y="244" width="262" height="46" stroke-dasharray="4 3"/>
-          <rect x="584" y="244" width="262" height="46" stroke-dasharray="4 3"/>
+          <rect x="250" y="82" width="360" height="58"/>
+          <rect x="14" y="162" width="262" height="54"/>
+          <rect x="299" y="162" width="262" height="54"/>
+          <rect x="584" y="162" width="262" height="54"/>
+          <rect x="14" y="248" width="262" height="46" stroke-dasharray="4 3"/>
+          <rect x="299" y="248" width="262" height="46" stroke-dasharray="4 3"/>
+          <rect x="584" y="248" width="262" height="46" stroke-dasharray="4 3"/>
         </g>
         <g font-family="var(--serif)" font-size="13" fill="#17161a">
-          <text x="430" y="42" text-anchor="middle">X3-F 在拟定运行场景下具有可接受的安全性</text>
+          <text x="430" y="42" text-anchor="middle">倾转旋翼在拟定运行场景下具有可接受的安全性</text>
           <text x="430" y="114" text-anchor="middle" font-size="12">按 ARP4754A / 4761 完成 FHA → PSSA → SSA</text>
-          <text x="430" y="130" text-anchor="middle" font-size="12">并用运行限制收窄暴露</text>
-          <text x="145" y="184" text-anchor="middle" font-size="12.5">危害已被完整识别</text>
-          <text x="430" y="184" text-anchor="middle" font-size="12.5">每条灾难性路径 ≤10⁻⁹/h</text>
-          <text x="715" y="184" text-anchor="middle" font-size="12.5">剩余风险被运行限制控制</text>
+          <text x="430" y="131" text-anchor="middle" font-size="12">并对转换段单独给包线与失效假设</text>
+          <text x="145" y="188" text-anchor="middle" font-size="12.5">危害已被完整识别</text>
+          <text x="430" y="188" text-anchor="middle" font-size="12.5">转换段每条路径 ≤10⁻⁹/h</text>
+          <text x="715" y="188" text-anchor="middle" font-size="12.5">剩余风险被运行限制控制</text>
         </g>
         <g font-family="var(--mono)" font-size="9" fill="#7a746a">
           <text x="286" y="26">GOAL G1</text>
-          <text x="266" y="96">STRATEGY S1</text>
-          <text x="30" y="176">GOAL G2</text>
-          <text x="315" y="176">GOAL G3</text>
-          <text x="600" y="176">GOAL G4</text>
-          <text x="30" y="262">EVIDENCE E1</text>
-          <text x="315" y="262">EVIDENCE E2</text>
-          <text x="600" y="262">EVIDENCE E3</text>
+          <text x="266" y="98">STRATEGY S1</text>
+          <text x="30" y="180">GOAL G2</text>
+          <text x="315" y="180">GOAL G3</text>
+          <text x="600" y="180">GOAL G4</text>
+          <text x="30" y="266">EVIDENCE E1</text>
+          <text x="315" y="266">EVIDENCE E2</text>
+          <text x="600" y="266">EVIDENCE E3</text>
         </g>
         <g font-family="var(--mono)" font-size="9.5" fill="#4c4840">
-          <text x="145" y="200" text-anchor="middle">FHA · STPA · HAZOP</text>
-          <text x="430" y="200" text-anchor="middle">FTA · CCA · FMEA · 试验</text>
-          <text x="715" y="200" text-anchor="middle">空域 · 场地 · 维护 · 训练</text>
-          <text x="145" y="272" text-anchor="middle">危害清单与严重度分级记录</text>
-          <text x="430" y="272" text-anchor="middle">失效概率计算 + 台架 / 试飞证据</text>
-          <text x="715" y="272" text-anchor="middle">运行手册 · 限制 · 训练大纲</text>
+          <text x="145" y="204" text-anchor="middle">FHA · STPA · 走廊分析</text>
+          <text x="430" y="204" text-anchor="middle">FTA · CCA · 故障注入</text>
+          <text x="715" y="204" text-anchor="middle">空域 · 场地 · 程序 · 训练</text>
+          <text x="145" y="276" text-anchor="middle">危害清单与严重度分级记录</text>
+          <text x="430" y="276" text-anchor="middle">概率计算 + 台架 / 试飞证据</text>
+          <text x="715" y="276" text-anchor="middle">运行手册 · 限制 · 训练大纲</text>
         </g>
         <g stroke="#7a746a" stroke-width="1" fill="none" marker-end="url(#ar4)">
           <line x1="430" y1="62" x2="430" y2="78"/>
-          <line x1="430" y1="136" x2="430" y2="142"/>
-          <line x1="145" y1="142" x2="715" y2="142"/>
-          <line x1="145" y1="142" x2="145" y2="156"/>
-          <line x1="430" y1="142" x2="430" y2="156"/>
-          <line x1="715" y1="142" x2="715" y2="156"/>
-          <line x1="145" y1="212" x2="145" y2="242"/>
-          <line x1="430" y1="212" x2="430" y2="242"/>
-          <line x1="715" y1="212" x2="715" y2="242"/>
+          <line x1="430" y1="140" x2="430" y2="146"/>
+          <line x1="145" y1="146" x2="715" y2="146"/>
+          <line x1="145" y1="146" x2="145" y2="160"/>
+          <line x1="430" y1="146" x2="430" y2="160"/>
+          <line x1="715" y1="146" x2="715" y2="160"/>
+          <line x1="145" y1="216" x2="145" y2="246"/>
+          <line x1="430" y1="216" x2="430" y2="246"/>
+          <line x1="715" y1="216" x2="715" y2="246"/>
         </g>
         <g fill="#faf8f2" stroke="#9c2f1f" stroke-width="1.2">
           <rect x="14" y="316" width="832" height="70"/>
@@ -880,12 +858,12 @@ strong{font-weight:600}
           <text x="30" y="336">GAP · 目前公开信息中缺失的证据</text>
         </g>
         <g font-family="var(--serif)" font-size="12.5" fill="#17161a">
-          <text x="30" y="356">SSA / CCA 结论未公开　·　专用条件尚未定稿　·　分合寿命与互锁验证未见　·　整机伞构型待确认</text>
+          <text x="30" y="356">作动器双路径与卡阻试验未公开　·　转换包线数据未见　·　电池与逆变器隔离拓扑未见　·　SSA / CCA 结论未公开</text>
           <text x="30" y="376">没有这四类证据，G3 只能算"有论证框架"，不能算"论证成立"。</text>
         </g>
       </svg>
     </div>
-    <figcaption><b>图 5</b>安全论证结构。越往下越具体：目标 → 策略 → 三个子目标 → 三类证据；红色框是空着的位置。</figcaption>
+    <figcaption><b>图 6</b>安全论证结构。越往下越具体：目标 → 策略 → 三个子目标 → 三类证据；红色框是空着的位置。</figcaption>
   </figure>
 
   <h3>证据在哪儿</h3>
@@ -894,52 +872,52 @@ strong{font-weight:600}
     <table>
       <thead><tr><th>证据类型</th><th>验证对象</th><th>回答的问题</th><th>公开可见度</th></tr></thead>
       <tbody>
-        <tr><td class="model">静力 / 疲劳试验</td><td>机身、机臂、接口</td><td>极限载荷下不破坏、寿命内不裂</td><td>零星见于宣传</td></tr>
-        <tr><td class="model">坠撞试验</td><td>座舱、座椅、约束</td><td>可生存坠撞下保住座舱容积</td><td class="bad">未见公开</td></tr>
-        <tr><td class="model">电池滥用试验</td><td>电芯、模组、包</td><td>针刺 / 过充 / 热箱后不蔓延</td><td class="bad">未见公开</td></tr>
+        <tr><td class="model">转换包线试飞</td><td>短舱角—空速走廊</td><td>出界仍可控的边界在哪</td><td>有"包线扩展"表述，无数据</td></tr>
+        <tr><td class="model">作动器卡阻注入</td><td>倾转作动系统</td><td>单侧卡阻后能否维持可控并着陆</td><td class="bad">未见公开</td></tr>
+        <tr><td class="model">双路径切换试验</td><td>冗余作动</td><td>两条路径是否真的独立</td><td class="bad">未见公开</td></tr>
+        <tr><td class="model">单桨 / 单电机失效试飞</td><td>推进系统</td><td>丢一个螺旋桨后的操稳与性能</td><td>有厂商表述</td></tr>
+        <tr><td class="model">电池滥用与隔离试验</td><td>四组隔离电池</td><td>单组热失控不蔓延、其余组仍可供能</td><td class="bad">未见公开</td></tr>
         <tr><td class="model">HIRF / EMC</td><td>全机电子系统</td><td>强场下不误动作</td><td class="bad">未见公开</td></tr>
-        <tr><td class="model">软件适航（DO-178C）</td><td>飞控、显示、BMS</td><td>DAL 等级对应的覆盖与独立性</td><td class="bad">未见公开</td></tr>
-        <tr><td class="model">台架 / 铁鸟</td><td>飞控闭环、余度切换</td><td>故障注入后仍可控</td><td class="bad">未见公开</td></tr>
-        <tr><td class="model">试飞（包线扩展、三高）</td><td>操稳、性能、环境适应性</td><td>设计值是否在包线内成立</td><td>有视频与"已开展"表述</td></tr>
-        <tr><td class="model">分合寿命试验</td><td>锁止机构、导向</td><td>每日循环下的疲劳与公差</td><td class="bad">未见公开</td></tr>
-        <tr><td class="model">整机伞试验</td><td>救生系统</td><td>最低开伞高度与下降率</td><td>X2 上完成 50 m 开伞</td></tr>
-        <tr><td class="model">运行验证（沙盒 / 营地）</td><td>运行程序、人员</td><td>真实环境下的事故率</td><td>有沙盒与交付表述</td></tr>
+        <tr><td class="model">软件适航（DO-178C）</td><td>飞控、模式管理</td><td>DAL A 对应的覆盖与独立性</td><td class="bad">未见公开</td></tr>
+        <tr><td class="model">静力 / 疲劳试验</td><td>短舱、机翼、连接件</td><td>转换载荷下的寿命</td><td>有"已完成"表述</td></tr>
+        <tr><td class="model">结冰试验</td><td>短舱、桨叶、空速系统</td><td>结冰包线内的可用性</td><td class="bad">未见公开</td></tr>
+        <tr><td class="model">运行验证</td><td>程序、人员、场地</td><td>真实环境的事故率</td><td>有试运行表述</td></tr>
       </tbody>
     </table>
   </div>
-  <p class="cap-note">表 9　证据类型与公开可见度。"未见公开"不等于"没做"，但安全论证的规矩是：没有证据就不能主张结论。</p>
+  <p class="cap-note">表 8　证据类型与公开可见度。"未见公开"不等于"没做"，但安全论证的规矩是：没有证据就不能主张结论。</p>
 
   <h3>结论</h3>
 
   <div class="ruling keep">
-    <div class="hd"><b>裁定一 · 架构</b><i>成立</i></div>
+    <div class="hd"><b>裁定一 · 架构冗余</b><i>成立</i></div>
     <div class="bd">
-      <p>六轴六桨 + 2 副失效容错、飞控 / 供电 / 通信 / 操控多通道冗余、涵道包容，这套架构在工程上说得通；关键子系统的失效模式与缓解手段也都有对应的成熟做法。它不需要发明新原理，只需要把证据做扎实。</p>
+      <p>电机级冗余（每桨双电机、双逆变器、四组隔离电池、三套电传飞控）加上"丢任意一个螺旋桨仍可控"的厂商口径，在工程上站得住。这一层解决的是"单元失效"，它做得比多旋翼更彻底。</p>
     </div>
   </div>
 
   <div class="ruling cond">
-    <div class="hd"><b>裁定二 · 安全论证</b><i>条件成立</i></div>
+    <div class="hd"><b>裁定二 · 转换段</b><i>条件成立</i></div>
     <div class="bd">
-      <p>在"私人娱乐、昼间、隔离空域、营地起降、非商业载客"这套场景下，安全论证有闭合的可能；前提是 SSA 与 CCA 能拿出结论、专用条件定稿、分合机构的互锁与寿命得到验证。这三件事现在都还没有公开证据。</p>
+      <p>转换段的可控性取决于两件事：作动器有没有第二条独立路径，以及检测—重构的覆盖率能不能做到 99.9% 以上。这两件事都不在公开资料里。做到了，转换段可以按 10⁻⁹ 论证；做不到，它就是一个单点。</p>
     </div>
   </div>
 
   <div class="ruling">
-    <div class="hd"><b>裁定三 · 10⁻⁹ 目标</b><i>未完成，不是不满足</i></div>
+    <div class="hd"><b>裁定三 · 构型选择</b><i>这是交易，不是优劣</i></div>
     <div class="bd">
-      <p>按公开构型做的量级测算，合计落在 10⁻⁶ 附近，比目标高三个数量级。但这个数字完全取决于 β 与单套设备失效率——它是"用示例参数算出来的缺口"，不是对 X3-F 的符合性判定。要么证明 β 在 10⁻⁵ 量级、单套设备在 10⁻⁵ 量级，要么承认这条预算在私人娱乐档位另有口径。</p>
+      <p>多旋翼简单、取证快、航程短；复合翼把升力和推力解耦，代价是巡航死重；倾转效率最高，代价是把安全论证的难点集中在"转换"这几十秒里。三种构型没有谁"更安全"，只有谁的难点被现有证据覆盖得更好。</p>
     </div>
   </div>
 
-  <p>一句话收尾：它更像一架"被允许更早起飞的小型有人飞行器"，而不是"被放大的消费电子"。评价它的安全水平，不该看发布会上的冗余数字，而该问三个问题——<b>共因分析做了没有、分合机构的互锁有多硬、最坏那一次坠撞里人还能不能出来</b>。</p>
+  <p>一句话收尾：倾转旋翼不是"更先进所以更安全"，它是<b>用一段最难的飞行换来了其余航程的效率</b>。评价它的安全水平，不该看巡航速度，而该问三个问题——作动器卡住时有没有第二条路、转换走廊的数据敢不敢公开、以及出界那一下还能不能改出。</p>
 </section>
 
 <section id="s9">
   <h2><span class="num">09</span>引用</h2>
   <div class="sub">References</div>
 
-  <p>标准条款按公开摘要与课程讲义转述，未逐条引用原文。文中标注"推定"与"示例"的数字，均为按构型与框架推导的量级演示。</p>
+  <p>标准条款按公开摘要与课程讲义转述，未逐条引用原文。文中标注"推定""示例"的数字，均为按构型与框架推导的量级演示。</p>
 
   <ol class="refs">
     <li>课程讲义《第四章 飞行汽车的现状及展望》，张玉新，吉林大学，2026。<em>安全方法学、10⁻⁹ 目标、作业要求</em></li>
@@ -948,19 +926,19 @@ strong{font-weight:600}
     <li><a href="https://www.sae.org/standards/content/arp4754a/">SAE ARP4754A</a><em>民用飞机与系统开发指南</em></li>
     <li><a href="https://www.sae.org/standards/content/arp4761/">SAE ARP4761</a><em>安全评估过程：FHA / PSSA / SSA / CCA</em></li>
     <li><a href="https://www.rtca.org/">RTCA DO-178C</a><em>机载软件，DAL A–D</em></li>
-    <li><a href="http://www.caac.gov.cn/">中国民航局 · CCAR-21</a><em>民用航空产品和零部件合格审定规定</em></li>
-    <li><a href="https://www.cnstock.com/commonDetail/377540">上海证券报：X3-F 专用条件征求意见</a><em>私人娱乐定位、最大起飞重量 960 kg</em></li>
-    <li><a href="https://chejiahao.autohome.com.cn/info/16675705">车家号：陆地航母首飞与冗余配置</a><em>动力 2 / 飞控 3 / 供电 2 / 通信 2 / 操控 2</em></li>
-    <li><a href="https://bbs.xiaopeng.com/article/3511676">小鹏社区：六轴六桨双涵道构型</a><em>碳纤维机身与桨叶</em></li>
-    <li><a href="https://www.163.com/dy/article/IHT1N9FE05279L3C.html">网易：双旋翼失效仍可控；超低空多伞救生系统</a><em>X2 上 50 m 开伞试验</em></li>
-    <li><a href="https://chejiahao.autohome.com.cn/article/14373926">汽车之家：早期构型口径（八组电池 / 4 轴 8 桨）</a><em>用于说明构型迭代</em></li>
-    <li><a href="https://lab.autozyx.com/fundamentals-of-flying-vehicle-technology/tesla-flying-roadster/">课程给出的作业样例（Tesla Roadster 调研页）</a><em>体例参考</em></li>
+    <li><a href="https://www.x-techcon.com/article/1412.html">Power-lift 的过渡走廊</a><em>转换走廊的上/下边界定义</em></li>
+    <li><a href="https://www.aopa.org/news-and-media/all-news/2023/april/pilot/joby-s4-coming-to-you-in-2025">AOPA：Joby S4 与三套电传飞控</a><em>飞控冗余与模式管理</em></li>
+    <li><a href="https://verticalavi.org/news/vai-weekly/joby-aviator-its-evtol-aircraft-makes-verticon-debut/">Vertical：S4 六个倾转螺旋桨（4 机翼 + 2 V 尾）</a><em>每桨两台电机</em></li>
+    <li><a href="https://qad.lawa.org/sites/lawa/files/documents/1-17-24%20Joby%20AAM%20Presentation.pdf">Joby AAM 演示材料</a><em>双逆变器 / 四组隔离电池 / 丢一桨仍可控（厂商口径）</em></li>
+    <li><a href="https://vertus.aero/intelligence/companies/joby-aviation">Vertus：S4 审定阶段与参数</a><em>FAA Stage 3 一类表述</em></li>
+    <li><a href="http://hkgcjz.cnjournals.com/ch/reader/create_pdf.aspx?file_no=2023169&amp;year_id=2025&amp;quarter_id=1&amp;falg=1">倾转旋翼短舱倾转作动关键技术</a><em>作动原理与卡阻风险</em></li>
+    <li><a href="https://simpleflying.com/electric-air-taxis-actually-ready-passengers-2026/">Simple Flying：2026 年 eVTOL 是否真的可载客</a><em>认证进度与参数复核</em></li>
   </ol>
 </section>
 
 <footer>
   <div class="rule"></div>
-  <div>飞行汽车技术基础 · 课程作业-2　|　对象：小鹏汇天「陆地航母」X3-F　|　资料截至 2026-11</div>
+  <div>飞行汽车技术基础 · 课程作业-2　|　对象：倾转旋翼 eVTOL（以公开的 Joby S4 为样本）　|　资料截至 2026-11</div>
   <div>单文件 · 零外部依赖 · 可离线打开　|　快捷键：P 打印　·　Esc 回顶</div>
   <div>教学研究用途；文中推定与示例数值不构成对该型号适航符合性的判断。</div>
 </footer>
@@ -987,9 +965,8 @@ strong{font-weight:600}
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
 
-  /* 目录高亮（按滚动位置取最近一章） */
-  var links = $$('#toc a');
-  var secs = $$('section');
+  /* 目录高亮 */
+  var links = $$('#toc a'), secs = $$('section');
   function syncToc() {
     var y = window.scrollY + 150, cur = secs[0];
     secs.forEach(function (s) { if (s.offsetTop <= y) cur = s; });
@@ -1028,14 +1005,11 @@ strong{font-weight:600}
     });
   });
 
-  /* 预算调节器 */
-  var lam = $('#lam'), beta = $('#beta'), bat = $('#bat');
-  if (lam) {
+  /* 转换段预算调节器 */
+  var lamEl = $('#lam'), covEl = $('#cov'), betaEl = $('#beta');
+  if (lamEl) {
     var TARGET = 1e-9;
-    var fmt = function (p) {
-      var s = p.toExponential(1).replace('e-', '×10⁻').replace('e+', '×10');
-      return s;
-    };
+    var fmt = function (p) { return p.toExponential(1).replace('e-', '×10⁻').replace('e+', '×10'); };
     var mult = function (p) {
       var m = p / TARGET;
       if (m < 10) return '×' + m.toFixed(1);
@@ -1043,47 +1017,49 @@ strong{font-weight:600}
       return '×' + m.toExponential(0).replace('e+', '×10');
     };
     var update = function () {
-      var L = Math.pow(10, -5 + (lam.value / 100) * 3);            /* 1e-5 .. 1e-2 */
-      var B = Math.pow(10, -5 + (beta.value / 100) * 3.699);        /* 1e-5 .. 5e-2 */
-      var R = Math.pow(10, -7 + (bat.value / 100) * 2);             /* 1e-7 .. 1e-5 */
-      var ind = 3 * L * L, cc = B * L, sum = ind + cc;
-      var batt = R * 0.1, tot = sum + batt + 2.5e-12;
+      var L = Math.pow(10, -6 + lamEl.value / 50);
+      var C = 1 - Math.pow(10, -covEl.value / 25);
+      var B = Math.pow(10, -5 + (betaEl.value / 100) * 3.699);
+      var ind = L * (1 - C), cc = B * L, sum = ind + cc;
       $('#outLam').textContent = fmt(L);
+      $('#outCov').textContent = (C * 100).toFixed(C > 0.999 ? 3 : 1) + '%';
       $('#outBeta').textContent = B >= 0.001 ? B.toFixed(4) : B.toExponential(1).replace('e-', '×10⁻');
-      $('#outBat').textContent = fmt(R);
       $('#rInd').textContent = fmt(ind);
       $('#rCc').textContent = fmt(cc);
       $('#rSum').textContent = fmt(sum);
-      $('#rBat').textContent = fmt(batt);
-      $('#rTot').textContent = fmt(tot) + ' ' + mult(tot);
+      $('#rTot').textContent = mult(sum);
       var share = Math.round(cc / sum * 100);
-      var verdict;
-      if (tot <= TARGET) {
-        verdict = '在预算内。此时主导项是 <b>' + (ind > batt ? '独立项 3λ²' : '电池单点') + '</b>，共因占飞控 ' + share + '%。';
+      var v;
+      if (sum <= TARGET) {
+        v = '在预算内。此时主导项是 <b>' + (ind > cc ? '单点残余' : '共因项') + '</b>，共因占 ' + share + '%。';
       } else {
-        verdict = '超出目标 <b>' + mult(tot).slice(1) + '</b>。共因占飞控 ' + share +
-          '%，' + (cc > ind ? '主导项是共因 βλ' : '主导项是独立项 3λ²') +
-          '——把 β 拖到 10⁻⁵ 可以看到，共因消失后仍压不到目标。';
+        var need = 1 - (TARGET - cc) / L;
+        if (need <= 0 || need > 0.999999) {
+          v = '超出目标 <b>' + mult(sum).slice(1) + '</b>。共因项 ' + share + '% 已单独超过预算——先把 β 压下来，再谈覆盖率。';
+        } else {
+          v = '超出目标 <b>' + mult(sum).slice(1) + '</b>。要把单点残余压到预算内，覆盖率需要 ≥ <b>' +
+            (need * 100).toFixed(3) + '%</b>；当前 ' + (C * 100).toFixed(C > 0.999 ? 3 : 1) + '%。';
+        }
       }
-      $('#verdict').innerHTML = verdict;
+      $('#verdict').innerHTML = v;
     };
-    [lam, beta, bat].forEach(function (el) { el.addEventListener('input', update); });
+    [lamEl, covEl, betaEl].forEach(function (el) { el.addEventListener('input', update); });
     update();
   }
 
   /* 风险矩阵 */
   var HZ = [
-    { id: 'H1', n: '空中分离', s: 4, p: 1, d: '分合锁在飞行中解锁，飞行体脱离', c: '双余度锁 + 飞行中互锁 + 到位双确认', r: '互锁失效是最难排除的路径；需专项 FMEA 与误操作试验' },
-    { id: 'H2', n: '电池热失控', s: 4, p: 2, d: '单体短路蔓延至整包，推力归零并起火', c: '热障 / 熔断 / 独立舱 / BMS 预警', r: '缓解后仍是单点；毒烟与座舱完整性另需论证' },
-    { id: 'H3', n: '飞控共因失效', s: 4, p: 1, d: '同源软件或共模电源同时打掉三套通道', c: '相异软件 + 独立供电 + 交叉比较', r: 'β 未公开前，冗余的独立性无法判断' },
-    { id: 'H4', n: '重着陆 / 硬着陆', s: 3, p: 4, d: '下沉气流或侧风超限，触地过载超限', c: '包线保护 + 自动着陆限制 + 训练', r: '保护逻辑依赖传感器可信度' },
-    { id: 'H5', n: '分合未锁到位', s: 3, p: 3, d: '带载起飞，锁止在振动中失效', c: '载荷 / 位移双确认 + 飞控互锁', r: '微动开关早闭是典型误报点' },
-    { id: 'H6', n: '低空风切变', s: 3, p: 3, d: '起降段遭遇下沉气流，高度不可恢复', c: '风速限制 + 场地选址 + 气象窗口', r: '低空气象预报精度本身有限' },
-    { id: 'H7', n: '地面第三方伤亡', s: 4, p: 2, d: '坠撞或掉件落在营地区域内的人员', c: '隔离空域 + 场地围界 + 航线避开人群', r: '第三方风险的控制完全依赖运行管理' },
-    { id: 'H8', n: '营地充电火灾', s: 2, p: 3, d: '高倍率充电引发热失控，波及建筑', c: '充电监控 + 消防 + 间距', r: '地面火灾常被排除在"飞行安全"之外' },
-    { id: 'H9', n: '数据链中断', s: 2, p: 4, d: '失去监视与远程干预能力', c: '双链路 + 自主返航', r: '对有人驾驶影响有限，对远程接管影响大' },
-    { id: 'H10', n: '噪声扰民', s: 1, p: 5, d: '起降与低空通过时的持续噪声', c: '涵道降噪 + 航线避让 + 时段限制', r: '社区接受度可能比技术指标更早成为瓶颈' },
-    { id: 'H11', n: '桨叶断裂击伤', s: 3, p: 2, d: '桨叶失效飞出，伤及地面人员', c: '涵道包容 + 损伤容限 + 检查', r: '涵道提供包容，但开口方向仍有暴露' }
+    { id: 'H1', n: '单侧作动器卡阻', s: 4, p: 2, d: '转换段一侧短舱卡住，另一侧继续倾转', c: '双路径作动 + 同步比较 + 限幅', r: '双路径是否真独立，公开资料无法确认' },
+    { id: 'H2', n: '过早进入转换', s: 4, p: 2, d: '空速未达下边界就转平，升力不足', c: '包线保护 + 转换窗口 + 训练', r: '保护依赖空速源可信度' },
+    { id: 'H3', n: '控制律切换失效', s: 4, p: 1, d: '悬停律与巡航律交接时指令错位', c: '模式管理 + 台架与铁鸟试验', r: '切换瞬态的证据未见公开' },
+    { id: 'H4', n: '单桨失效', s: 3, p: 3, d: '丢一个螺旋桨，非对称力矩出现', c: '每桨双电机 + 其余单元补偿', r: '厂商称可控，试飞数据未公开' },
+    { id: 'H5', n: '电池组隔离失效', s: 4, p: 2, d: '单组热失控蔓延或母线短路', c: '四组隔离 + 熔断 + 热障', r: '隔离拓扑未公开' },
+    { id: 'H6', n: '转换中气动干扰', s: 3, p: 3, d: '旋翼尾流扫过机翼，抖振与力矩突变', c: '风洞与试飞包线、结构裕度', r: '干扰的边界条件难穷举' },
+    { id: 'H7', n: '空速系统共模', s: 3, p: 3, d: '空速管堵塞或结冰，三套飞控同时误判', c: '多源空速 + 一致性检查', r: '共用气动源时仍可能同错' },
+    { id: 'H8', n: '结冰', s: 3, p: 2, d: '短舱与桨叶结冰，推力与配平恶化', c: '结冰包线 + 防冰 + 禁飞限制', r: '结冰试验数据未见' },
+    { id: 'H9', n: '第三方地面风险', s: 4, p: 1, d: '城市上空失效导致地面人员伤亡', c: '隔离空域 + 航线避开人口密集区', r: '完全依赖运行管理' },
+    { id: 'H10', n: '噪声与社区接受', s: 1, p: 4, d: '起降与低空通过的持续噪声', c: '航线避让 + 时段限制', r: '可能比技术更早成为瓶颈' },
+    { id: 'H11', n: '维护与校准差错', s: 3, p: 2, d: '作动器限位未复位、同步未校准', c: '双人复核 + 飞行前 BIT', r: '地面差错的探测仍靠人' }
   ];
   var SEV = { 1: 'D 轻微', 2: 'C 重大', 3: 'B 危险', 4: 'A 灾难' };
   var PROB = { 5: '频繁', 4: '可能', 3: '偶发', 2: '罕见', 1: '极罕见' };
@@ -1133,6 +1109,3 @@ strong{font-weight:600}
 </script>
 </body>
 </html>
-
-
-
