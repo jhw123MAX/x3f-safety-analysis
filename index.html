@@ -1,0 +1,1138 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>「陆地航母」X3-F 的安全账 · 从运行概念到 10⁻⁹ 的预算</title>
+<meta name="description" content="针对小鹏汇天「陆地航母」飞行体 X3-F 的系统安全分析：运行概念、审定基础、FHA/STPA、FTA/CCA、关键子系统、运行限制与安全论证。">
+<style>
+:root{
+  --paper:#f4f1e8;
+  --paper-2:#ebe6d8;
+  --ink:#17161a;
+  --ink-2:#4c4840;
+  --ink-3:#7a746a;
+  --rule:#c6bfaf;
+  --rule-2:#ddd6c6;
+  --red:#9c2f1f;
+  --green:#1f4d3f;
+  --blue:#2a4a6b;
+  --serif:"Source Han Serif SC","Noto Serif SC","Songti SC","STSong",SimSun,"Times New Roman",serif;
+  --mono:"JetBrains Mono","Cascadia Mono",Consolas,"Courier New",monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--serif);font-size:16.5px;line-height:1.95;
+  -webkit-font-smoothing:antialiased;
+  background-image:linear-gradient(90deg,rgba(198,191,175,.14) 1px,transparent 1px);
+  background-size:64px 100%;
+}
+#progress{position:fixed;top:0;left:0;height:2px;background:var(--red);width:0;z-index:99;transition:width .08s linear}
+
+.wrap{max-width:1180px;margin:0 auto;padding:0 34px}
+.col{max-width:760px}
+
+/* ---------- 封面档案头 ---------- */
+header.cover{padding:56px 0 40px;border-bottom:1px solid var(--ink)}
+.stamp{display:flex;flex-wrap:wrap;gap:0;border:1px solid var(--ink);width:max-content;font-family:var(--mono);font-size:11px;letter-spacing:.06em}
+.stamp span{padding:7px 13px;border-right:1px solid var(--ink)}
+.stamp span:last-child{border-right:0}
+.stamp b{font-weight:600;color:var(--red)}
+h1{font-size:clamp(28px,4.2vw,44px);line-height:1.3;letter-spacing:-.01em;margin:26px 0 0;font-weight:600}
+h1 em{font-style:normal;color:var(--red)}
+.deck{margin:20px 0 0;font-size:18px;color:var(--ink-2);max-width:680px;line-height:1.8}
+.byline{margin-top:30px;display:flex;flex-wrap:wrap;gap:26px;font-family:var(--mono);font-size:11.5px;color:var(--ink-3);letter-spacing:.05em}
+.byline b{color:var(--ink);font-weight:600}
+
+/* ---------- 摘要 ---------- */
+.abstract{margin:0 0 8px;padding:26px 28px;background:var(--paper-2);border-left:3px solid var(--red)}
+.abstract h2{margin:0 0 10px;font-size:13px;font-family:var(--mono);letter-spacing:.14em;font-weight:600;color:var(--red)}
+.abstract p{margin:0 0 10px}
+.abstract p:last-child{margin-bottom:0}
+.abstract ol{margin:10px 0 0;padding-left:22px}
+.abstract li{margin-bottom:6px}
+
+/* ---------- 目录 ---------- */
+nav.toc{border-bottom:1px solid var(--rule);padding:18px 0;position:sticky;top:0;background:var(--paper);z-index:20}
+nav.toc ol{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:4px 26px;font-family:var(--mono);font-size:12px}
+nav.toc a{color:var(--ink-2);text-decoration:none;display:inline-block;padding:3px 0;border-bottom:1px solid transparent}
+nav.toc a:hover{color:var(--red);border-bottom-color:var(--red)}
+nav.toc a.on{color:var(--red);border-bottom-color:var(--red)}
+nav.toc a i{font-style:normal;color:var(--ink-3);margin-right:6px}
+
+/* ---------- 章节 ---------- */
+section{padding:52px 0 14px;border-bottom:1px solid var(--rule-2);scroll-margin-top:70px}
+section>h2{font-size:24px;font-weight:600;margin:0 0 6px;letter-spacing:-.005em;display:flex;align-items:baseline;gap:14px}
+section>h2 .num{font-family:var(--mono);font-size:12px;color:var(--red);letter-spacing:.1em;font-weight:600}
+section>.sub{margin:0 0 26px;font-size:12px;font-family:var(--mono);letter-spacing:.1em;color:var(--ink-3);text-transform:uppercase}
+section p{margin:0 0 18px}
+section h3{font-size:16.5px;font-weight:600;margin:30px 0 10px}
+section h3 .tag{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);font-weight:400;margin-left:8px;letter-spacing:.08em}
+
+section.first p.lead::first-letter{float:left;font-size:44px;line-height:1;padding:6px 10px 0 0;color:var(--red);font-weight:600}
+
+/* ---------- 图版 ---------- */
+figure{margin:32px 0;border:1px solid var(--rule);background:#faf8f2}
+figure .canvas{padding:22px 18px;overflow-x:auto}
+figure svg{display:block;width:100%;height:auto;min-width:420px}
+figcaption{border-top:1px solid var(--rule);padding:11px 16px;font-size:12.5px;color:var(--ink-2);font-family:var(--mono);letter-spacing:.02em;line-height:1.7}
+figcaption b{color:var(--ink);letter-spacing:.06em;margin-right:8px}
+
+/* ---------- 标签页 ---------- */
+.tabs{display:flex;flex-wrap:wrap;gap:0;border:1px solid var(--ink);margin:26px 0 0;width:max-content;max-width:100%}
+.tabs button{font-family:var(--mono);font-size:12.5px;letter-spacing:.06em;padding:10px 18px;background:transparent;border:0;border-right:1px solid var(--ink);cursor:pointer;color:var(--ink-2)}
+.tabs button:last-child{border-right:0}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--paper)}
+.panel{display:none;border:1px solid var(--rule);border-top:0;padding:24px 22px;background:#faf8f2}
+.panel.on{display:block}
+.panel h4{margin:0 0 12px;font-size:15px;font-weight:600}
+.panel dl{margin:0;display:grid;grid-template-columns:92px 1fr;gap:6px 16px;font-size:14.5px}
+.panel dt{font-family:var(--mono);font-size:11px;color:var(--ink-3);letter-spacing:.06em;padding-top:4px}
+.panel dd{margin:0;line-height:1.75}
+.panel dd.good{color:var(--green)}
+.panel dd.bad{color:var(--red)}
+
+/* ---------- 表格 ---------- */
+.table-wrap{overflow-x:auto;margin:26px 0 8px;border-top:1.5px solid var(--ink);border-bottom:1.5px solid var(--ink)}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:760px}
+th{text-align:left;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;font-weight:600;padding:11px 12px;border-bottom:1px solid var(--ink);white-space:nowrap;cursor:pointer;user-select:none;position:relative}
+th[data-sort]:hover{color:var(--red)}
+th[data-sort]::after{content:"↕";font-size:9px;margin-left:5px;color:var(--ink-3)}
+th[data-sort][data-dir="asc"]::after{content:"↑";color:var(--red)}
+th[data-sort][data-dir="desc"]::after{content:"↓";color:var(--red)}
+td{padding:10px 12px;border-bottom:1px solid var(--rule-2);vertical-align:top;line-height:1.65}
+tbody tr:hover{background:var(--paper-2)}
+td.n{font-family:var(--mono);font-size:12.5px;white-space:nowrap}
+td.model{font-weight:600}
+.tag-a,.tag-b,.tag-c,.tag-d{font-family:var(--mono);font-size:10.5px;padding:2px 7px;border:1px solid currentColor;letter-spacing:.04em}
+.tag-a{color:var(--red)}
+.tag-b{color:#a8641a}
+.tag-c{color:var(--blue)}
+.tag-d{color:var(--green)}
+.cap-note{font-size:12.5px;color:var(--ink-3);margin:0 0 24px;font-family:var(--mono);line-height:1.75}
+
+/* ---------- 公式 ---------- */
+.formula{margin:26px 0;padding:20px 24px;border:1px solid var(--rule);background:#faf8f2;font-family:var(--mono);font-size:14px;line-height:2.1;overflow-x:auto}
+.formula .eq{color:var(--ink);font-size:15px}
+.formula .where{color:var(--ink-3);font-size:12px;line-height:1.9;margin-top:8px}
+.formula var{font-style:italic;color:var(--red);font-family:var(--serif);font-size:15.5px}
+
+/* ---------- 计算器 ---------- */
+.calc{border:1px solid var(--ink);background:#faf8f2;margin:30px 0}
+.calc-head{border-bottom:1px solid var(--ink);padding:12px 18px;font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.calc-head b{color:var(--red)}
+.calc-body{display:grid;grid-template-columns:1fr 1fr;gap:0}
+@media(max-width:760px){.calc-body{grid-template-columns:1fr}}
+.calc-in{padding:20px 22px;border-right:1px solid var(--rule)}
+@media(max-width:760px){.calc-in{border-right:0;border-bottom:1px solid var(--rule)}}
+.field{margin-bottom:18px}
+.field label{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;color:var(--ink-2);margin-bottom:6px}
+.field label output{color:var(--red);font-size:14px;font-weight:600}
+input[type=range]{width:100%;appearance:none;height:2px;background:var(--ink);outline:none;margin:8px 0}
+input[type=range]::-webkit-slider-thumb{appearance:none;width:13px;height:13px;background:var(--paper);border:1.5px solid var(--ink);cursor:pointer}
+.calc-out{padding:20px 22px;background:var(--paper-2)}
+.readout{display:flex;justify-content:space-between;align-items:baseline;padding:9px 0;border-bottom:1px dotted var(--rule)}
+.readout:last-of-type{border-bottom:0}
+.readout span{font-family:var(--mono);font-size:11.5px;color:var(--ink-2);letter-spacing:.04em}
+.readout b{font-family:var(--mono);font-size:17px;font-weight:600;font-variant-numeric:tabular-nums}
+.readout b small{font-size:10.5px;color:var(--ink-3);font-weight:400;margin-left:3px}
+.readout.hi b{color:var(--red);font-size:21px}
+.verdict{margin-top:14px;padding-top:12px;border-top:1px solid var(--rule);font-size:13px;line-height:1.7;color:var(--ink-2)}
+.verdict b{color:var(--ink)}
+.calc-foot{border-top:1px solid var(--rule);padding:11px 18px;font-family:var(--mono);font-size:10.5px;color:var(--ink-3);line-height:1.7}
+
+/* ---------- 时间线 ---------- */
+.timeline{margin:28px 0;border-left:1.5px solid var(--ink);padding-left:0;list-style:none}
+.timeline li{position:relative;padding:0 0 22px 26px;font-size:14.5px;line-height:1.75}
+.timeline li::before{content:"";position:absolute;left:-5px;top:9px;width:8px;height:8px;background:var(--paper);border:1.5px solid var(--ink);border-radius:50%}
+.timeline li.milestone::before{background:var(--red);border-color:var(--red)}
+.timeline .when{font-family:var(--mono);font-size:11.5px;color:var(--red);letter-spacing:.05em;display:block;margin-bottom:2px}
+.timeline .what{color:var(--ink-2)}
+.timeline li.dead::before{background:var(--ink-3);border-color:var(--ink-3)}
+.timeline li.dead .when{color:var(--ink-3)}
+.timeline li.dead .what{color:var(--ink-3);text-decoration:line-through;text-decoration-color:var(--rule)}
+
+/* ---------- 脚注 ---------- */
+sup.fn{font-family:var(--mono);font-size:9.5px;color:var(--red);cursor:pointer;padding:0 1px;vertical-align:super;line-height:0}
+sup.fn:hover,sup.fn.active{background:var(--red);color:var(--paper)}
+
+/* ---------- 结论卡 ---------- */
+.ruling{border:1px solid var(--ink);margin:20px 0;background:#faf8f2}
+.ruling .hd{display:flex;justify-content:space-between;gap:14px;padding:12px 18px;border-bottom:1px solid var(--rule);font-family:var(--mono);font-size:11px;letter-spacing:.08em;background:var(--paper-2)}
+.ruling .hd b{color:var(--ink)}
+.ruling .hd i{font-style:normal;color:var(--red);font-weight:600}
+.ruling .bd{padding:16px 18px}
+.ruling .bd p{margin:0 0 10px;font-size:14.5px}
+.ruling .bd p:last-child{margin:0}
+.ruling.keep .hd i{color:var(--green)}
+.ruling.cond .hd i{color:var(--ink-3)}
+
+/* ---------- 引用 ---------- */
+ol.refs{padding-left:0;list-style:none;counter-reset:r;font-size:13.5px;line-height:1.75}
+ol.refs li{counter-increment:r;position:relative;padding:9px 0 9px 40px;border-bottom:1px dotted var(--rule)}
+ol.refs li::before{content:"[" counter(r) "]";position:absolute;left:0;font-family:var(--mono);font-size:11px;color:var(--red);top:11px}
+ol.refs a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--rule);word-break:break-all}
+ol.refs a:hover{border-bottom-color:var(--red);color:var(--red)}
+ol.refs li:target{background:var(--paper-2)}
+ol.refs em{font-style:normal;color:var(--ink-3);font-family:var(--mono);font-size:11px;display:block;margin-top:2px}
+
+/* ---------- 工具条 ---------- */
+.toolbar{position:fixed;right:22px;bottom:22px;display:flex;flex-direction:column;gap:8px;z-index:50}
+.toolbar button{width:38px;height:38px;border:1px solid var(--ink);background:var(--paper);cursor:pointer;font-family:var(--mono);font-size:14px;color:var(--ink);display:grid;place-items:center}
+.toolbar button:hover{background:var(--ink);color:var(--paper)}
+
+footer{padding:44px 0 70px;font-family:var(--mono);font-size:11.5px;color:var(--ink-3);line-height:2}
+footer .rule{height:1px;background:var(--ink);margin-bottom:18px}
+
+mark{background:var(--paper-2);color:inherit;padding:0 3px;border-bottom:1px solid var(--rule)}
+strong{font-weight:600}
+.small{font-size:13px;color:var(--ink-3)}
+
+/* ---------- 风险矩阵 ---------- */
+.matrix{border:1px solid var(--rule);background:#faf8f2;padding:16px;overflow-x:auto}
+.mgrid{display:grid;grid-template-columns:56px repeat(4,1fr);gap:3px;min-width:520px}
+.mgrid .hd{display:grid;place-items:center;font-family:var(--mono);font-size:10.5px;color:var(--ink-3);padding:5px 2px;text-align:center;line-height:1.3}
+.mgrid .cell{min-height:46px;border:1px solid var(--rule-2);display:flex;flex-wrap:wrap;gap:3px;align-content:center;justify-content:center;padding:3px}
+.mgrid .cell.r1{background:rgba(31,77,63,.06)}
+.mgrid .cell.r2{background:rgba(31,77,63,.13)}
+.mgrid .cell.r3{background:rgba(168,100,26,.14)}
+.mgrid .cell.r4{background:rgba(156,47,31,.14)}
+.mgrid .cell.r5{background:rgba(156,47,31,.28)}
+.mdot{font-family:var(--mono);font-size:10px;width:19px;height:19px;display:grid;place-items:center;border:1px solid var(--ink);background:var(--paper);cursor:pointer;border-radius:50%}
+.mdot:hover,.mdot.on{background:var(--ink);color:var(--paper)}
+.mdetail{margin-top:12px;font-size:13.5px;line-height:1.75;color:var(--ink-2);border-top:1px solid var(--rule);padding-top:10px;min-height:60px}
+.mdetail b{color:var(--ink)}
+
+@media print{
+  body{background:#fff;font-size:10.5pt}
+  #progress,.toolbar,nav.toc{display:none}
+  section{page-break-inside:avoid}
+  a{color:#000;text-decoration:none}
+  figure,.panel,.calc{page-break-inside:avoid}
+}
+@media(max-width:700px){
+  .wrap{padding:0 18px}
+  body{font-size:16px}
+  .stamp{font-size:10px}
+  .stamp span{padding:6px 9px}
+  section{padding:40px 0 12px}
+  figure svg{min-width:340px}
+}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+
+<div class="wrap">
+
+<header class="cover">
+  <div class="stamp">
+    <span>文件编号 <b>SAF-X3F-2026-11</b></span>
+    <span>版本 <b>1.0</b></span>
+    <span>编制日期 <b>2026-11-21</b></span>
+    <span>密级 <b>公开</b></span>
+  </div>
+
+  <h1>「陆地航母」X3-F 的安全账<br><em>从运行概念到 10⁻⁹ 的预算</em></h1>
+
+  <p class="deck">它被限定在"私人娱乐"这一档，而不是"载客运营"。这个口径几乎决定了整本安全账怎么算——也决定了哪些证据现在必须有，哪些可以晚一点。</p>
+
+  <div class="byline">
+    <span>课程 <b>飞行汽车技术基础</b></span>
+    <span>范围 <b>整机功能 · 危害 · 因果 · 运行</b></span>
+    <span>方法 <b>FHA / STPA / FTA / CCA ＋ 公开资料复核</b></span>
+  </div>
+</header>
+
+<nav class="toc" id="toc">
+  <ol>
+    <li><a href="#s1"><i>01</i>摘要</a></li>
+    <li><a href="#s2"><i>02</i>系统与场景</a></li>
+    <li><a href="#s3"><i>03</i>审定基础</a></li>
+    <li><a href="#s4"><i>04</i>危害识别</a></li>
+    <li><a href="#s5"><i>05</i>因果与定量</a></li>
+    <li><a href="#s6"><i>06</i>关键子系统</a></li>
+    <li><a href="#s7"><i>07</i>运行安全</a></li>
+    <li><a href="#s8"><i>08</i>论证与结论</a></li>
+    <li><a href="#s9"><i>09</i>引用</a></li>
+  </ol>
+</nav>
+
+<section id="s1" class="first">
+  <h2><span class="num">01</span>摘要</h2>
+  <div class="sub">Summary</div>
+
+  <div class="abstract">
+    <h2>三句话</h2>
+    <ol>
+      <li><strong>架构方向是对的，缺的是证据。</strong>六轴六桨、2 副失效仍可控、飞控三套、供电与通信各两套——这套组合在工程上说得通。但"有几套冗余"是设计输入，"共因会不会同时打掉它们"才是安全结论，而后者需要 CCA 与 SSA，目前公开渠道看不到。</li>
+      <li><strong>真正吃掉预算的是单点与共因，不是独立失效。</strong>3 副旋翼同时失效在独立假设下只有 2.5×10⁻¹²／小时，小到可以忽略；可一旦共因比例 β 停在 10⁻²，飞控一项就是 2×10⁻⁶——比 10⁻⁹ 的目标高三个数量级。</li>
+      <li><strong>"私人娱乐"这个口径，决定整本账的算法。</strong>风险由知情同意的乘员承担、飞行被限制在昼间隔离空域与营地上空，所以它不必按载客运营去堆证据；反过来，一旦要商业载客，场景、目标概率、DAL 分配、运行限制全部要重做。</li>
+    </ol>
+  </div>
+
+  <p class="lead">这份材料的做法是：把 X3-F 的公开信息按"硬约束—厂商口径—推定"三级摆开，再用课程讲的那套系统安全工程把它走一遍——先定场景，再列危害，然后逐条追问因果，最后看证据够不够支撑结论。凡是只能靠公开资料推断的，文中一律写明"推定"；凡是我自己算的示例数字，都标为量级演示，不冒充实测。</p>
+
+  <p>结论不涉及"这架飞机安不安全"这种一句话判决。安全是<b>场景的函数</b>：在营地、昼间、双人、非商业运营的条件下，它可能是一门成立的生意；把这套结论平移到城市载客，<mark>一行都不成立</mark>。</p>
+</section>
+<section id="s2">
+  <h2><span class="num">02</span>系统与场景</h2>
+  <div class="sub">System &amp; operational concept</div>
+
+  <p>「陆地航母」不是一架飞机，也不是一辆车。它是把地面行驶与空中飞行拆成两个独立合规主体，再用一套可拆的机构合成一件商品：<b>飞行体按航空器审定，陆行体按机动车管理</b>，而两者结合之后的状态——装载着飞行体在公路上行驶——既不是纯汽车也不是纯飞机。</p>
+
+  <p>这个结构带来一个别人没有的好处：车规与适航互不迁就，各自干净。也带来一个别人没有的麻烦：<b>接口</b>。它是全机唯一同时承载两种相反安全要求的地方——地面要可靠解锁，空中要绝对锁死。</p>
+
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 660 340" role="img" aria-label="X3-F 三主体结构与三条安全边界示意">
+        <g fill="none" stroke="#17161a" stroke-width="1.2">
+          <line x1="290" y1="92" x2="398" y2="92"/>
+          <line x1="290" y1="92" x2="344" y2="38"/>
+          <line x1="290" y1="92" x2="236" y2="38"/>
+          <line x1="290" y1="92" x2="182" y2="92"/>
+          <line x1="290" y1="92" x2="236" y2="146"/>
+          <line x1="290" y1="92" x2="344" y2="146"/>
+          <circle cx="398" cy="92" r="15"/><circle cx="344" cy="38" r="15"/>
+          <circle cx="236" cy="38" r="15"/><circle cx="182" cy="92" r="15"/>
+          <circle cx="236" cy="146" r="15"/><circle cx="344" cy="146" r="15"/>
+        </g>
+        <ellipse cx="290" cy="92" rx="50" ry="17" fill="#faf8f2" stroke="#17161a" stroke-width="1.2"/>
+        <text x="290" y="96" text-anchor="middle" font-family="var(--mono)" font-size="10" fill="#4c4840">X3-F</text>
+
+        <line x1="290" y1="112" x2="290" y2="184" stroke="#7a746a" stroke-width="1" stroke-dasharray="4 4"/>
+        <rect x="252" y="186" width="76" height="24" fill="#faf8f2" stroke="#9c2f1f" stroke-width="1.1" stroke-dasharray="5 4"/>
+        <text x="290" y="202" text-anchor="middle" font-family="var(--mono)" font-size="9.5" fill="#9c2f1f">分合机构</text>
+        <text x="340" y="202" font-family="var(--mono)" font-size="9" fill="#7a746a">5 min 自动分合</text>
+
+        <g fill="none" stroke="#17161a" stroke-width="1.2">
+          <rect x="140" y="228" width="300" height="36"/>
+          <circle cx="176" cy="272" r="13"/><circle cx="290" cy="272" r="13"/><circle cx="404" cy="272" r="13"/>
+        </g>
+
+        <g font-family="var(--mono)" font-size="9.5" fill="#7a746a">
+          <text x="290" y="14" text-anchor="middle">飞行体 · 六轴六桨双涵道</text>
+          <text x="290" y="250" text-anchor="middle">陆行体 · 三轴六轮 / 增程补能</text>
+          <text x="120" y="296">GROUND</text>
+        </g>
+        <line x1="120" y1="288" x2="470" y2="288" stroke="#17161a" stroke-width="1"/>
+
+        <g fill="none" stroke-width="1.1">
+          <path d="M552 32 v120 M548 32 h8 M548 152 h8" stroke="#9c2f1f"/>
+          <path d="M552 178 v40 M548 178 h8 M548 218 h8" stroke="#1f4d3f"/>
+          <path d="M552 228 v64 M548 228 h8 M548 292 h8" stroke="#2a4a6b"/>
+        </g>
+        <g font-family="var(--mono)" font-size="9.5">
+          <text x="566" y="96" fill="#9c2f1f">航空边界</text>
+          <text x="566" y="202" fill="#1f4d3f">接口</text>
+          <text x="566" y="264" fill="#2a4a6b">机动车边界</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption><b>图 1</b>三主体与三条边界。右侧括注标出各段的规章归属：航空段走 CCAR-21 专用条件，机动车段走 GB 体系，中间的接口段没有现成条款。</figcaption>
+  </figure>
+
+  <h3>一次使用循环里，飞行只占很短一段</h3>
+
+  <p>把一次完整使用拆成七段，会发现飞行的占比并不大：地面行驶可能几十分钟，分合五分钟，起飞悬停一到三分钟，巡航看航线，进近着陆两三分钟，收纳与补能又是几十分钟。</p>
+
+  <p>这件事的后果是<b>指标口径</b>。适航的定量目标是"每飞行小时"的失效概率，而这类私人飞行器一年可能只飞几十小时——分母小，单次飞行的风险就被放大。所以看它的安全水平，不能只看 10⁻⁹，还要同时看"每架次"的风险，以及地面段那部分按机动车计的风险。</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>阶段</th><th>时长量级</th><th>主要危害</th><th>归属</th></tr></thead>
+      <tbody>
+        <tr><td>地面行驶</td><td class="n">数十分钟</td><td>制动、重心升高、侧风稳定性</td><td>机动车</td></tr>
+        <tr><td>分合 / 装载</td><td class="n">约 5 分钟</td><td>锁未到位、误分离、异物、人员被夹</td><td class="bad">接口（灰色）</td></tr>
+        <tr><td>起飞悬停</td><td class="n">1–3 分钟</td><td>单点失效、低空风切变、地面人员暴露</td><td>航空</td></tr>
+        <tr><td>爬升巡航</td><td class="n">看航线</td><td>多单元失效、电池衰减、空域冲突</td><td>航空</td></tr>
+        <tr><td>进近着陆</td><td class="n">2–5 分钟</td><td>下沉气流、侧风、重着陆、场地障碍</td><td>航空</td></tr>
+        <tr><td>收纳固定</td><td class="n">约 5 分钟</td><td>机构误动作、夹伤</td><td class="bad">接口（灰色）</td></tr>
+        <tr><td>补能与停放</td><td class="n">数小时</td><td>充电热失控、火灾、第三方靠近</td><td>机动车的边缘</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="cap-note">表 1　七段使用循环。灰色两段是两套体系都不完全覆盖的地带，也是后文反复出现的地方。</p>
+</section>
+
+<section id="s3">
+  <h2><span class="num">03</span>审定基础</h2>
+  <div class="sub">Certification basis</div>
+
+  <p>安全目标不是厂商定的，是从审定基础倒推出来的。X3-F 没有现成的类别标准可套——它既不是 CS-23 的常规飞机，也不是直升机——走的是《民用航空产品和零部件合格审定规定》下的<b>专用条件</b>：局方针对这一型号单独写一套要求。</p>
+
+  <ul class="timeline">
+    <li class="milestone">
+      <span class="when">2024-03-21</span>
+      <span class="what">型号合格证（TC）申请获民航中南局受理。确定"按航空器审定"，适用 CCAR-21。</span>
+    </li>
+    <li>
+      <span class="when">2025-03</span>
+      <span class="what">局方发布专用条件征求意见稿：面向<b>私人娱乐飞行</b>，最大起飞重量不超过 960 kg，由 1 名驾驶员驾驶。场景与重量级决定了严重度分级和第三方风险口径。</span>
+    </li>
+    <li>
+      <span class="when">2025-05-09</span>
+      <span class="what">生产许可证（PC）申请获受理。审定从"设计合规"扩展到"批产一致性"。</span>
+    </li>
+    <li class="dead">
+      <span class="when">截至 2026-11</span>
+      <span class="what">TC 与 PC 均未颁发。安全论证尚未被局方"接受"，只有"受理"。</span>
+    </li>
+  </ul>
+
+  <p>专用条件全文没有公开，所以下表的定量目标是按 SC-VTOL-01 与 CS-23 修正案 5 的通行做法<b>推定</b>的。若最终条款对"私人娱乐"档位放宽，下表的数值需要重算，但<b>方法论不变</b>——先分级，再分配目标，再逐条证明。</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>严重度</th><th>对飞行器 / 乘员的后果</th><th>目标概率 / 飞行小时</th><th>软件等级</th><th>X3-F 上的典型对应（推定）</th></tr></thead>
+      <tbody>
+        <tr><td><span class="tag-a">A 灾难性</span></td><td>机体损毁、多人死亡</td><td class="n">≤ 10⁻⁹</td><td class="n">DAL A</td><td>全部推力丧失、空中解体、空中误分离</td></tr>
+        <tr><td><span class="tag-b">B 危险</span></td><td>大幅降低安全裕度、机组难以完成任务的伤害</td><td class="n">≤ 10⁻⁷</td><td class="n">DAL B</td><td>单套飞控失效但未失控、迫降</td></tr>
+        <tr><td><span class="tag-c">C 重大</span></td><td>明显降低裕度、乘员不适或轻伤</td><td class="n">≤ 10⁻⁵</td><td class="n">DAL C</td><td>导航降级、非关键告警失效</td></tr>
+        <tr><td><span class="tag-d">D 轻微</span></td><td>轻微降低裕度、操作性受影响</td><td class="n">≤ 10⁻³</td><td class="n">DAL D</td><td>座舱显示异常、舒适性功能失效</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="cap-note">表 2　严重度分级与目标失效概率。10⁻⁹ 是整机灾难性事件的总预算，不是某一部件单独使用的额度。</p>
+
+  <h3>同一件事，三套体系的三套说法</h3>
+
+  <p>课上反复强调"车规级 → 航规级"的跃迁。落到纸面上，就是同一句"系统不能失效"在三个体系里对应完全不同的证据要求：汽车靠 ASIL 与流程，航空靠 FDAL 加定量目标，eVTOL 在两者之上再加专用的 VTOL 条款。</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>维度</th><th>汽车 · ISO 26262</th><th>航空 · ARP4754A/4761</th><th>eVTOL · SC-VTOL-01</th></tr></thead>
+      <tbody>
+        <tr><td>等级语言</td><td>ASIL A–D</td><td>FDAL / IDAL A–E</td><td>Category Basic / Enhanced</td></tr>
+        <tr><td>顶层方法</td><td>HARA（S×E×C 定 ASIL）</td><td>FHA → PSSA → SSA</td><td>与 ARP4754A 同构，加 VTOL 专用条款</td></tr>
+        <tr><td>定量目标</td><td>不直接给概率，靠流程与架构</td><td>按严重度给 10⁻⁹ / 10⁻⁷ / 10⁻⁵</td><td>灾难性 ≤10⁻⁹（与 ARP 一致）</td></tr>
+        <tr><td>共因</td><td>DFA（相关失效分析）</td><td>CCA（ZSA + CMA + PRA）</td><td>要求独立的 CCA 证据</td></tr>
+        <tr><td>软件</td><td>ISO 26262-6</td><td>DO-178C（DAL A–D）</td><td>同 DO-178C，含模型与工具鉴定</td></tr>
+        <tr><td>运行侧</td><td>道路 / 驾驶员 / 年检</td><td>运行规章 + 持续适航</td><td>起降场、空域、UTM 均需单独批准</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="cap-note">表 3　三套体系对照。差别不在名词，而在"要拿出什么证据才算数"。</p>
+
+  <p>有一处差异值得单拎出来：地面交通的兜底是"减速停车"，这个动作几乎总在身边；飞行器的兜底只有"继续可控地飞"或"可控地落"。所以功能安全里的 fail-safe，在航空里要换成 fail-operational——同样的词，架构代价完全不同。</p>
+</section>
+<section id="s4">
+  <h2><span class="num">04</span>危害识别</h2>
+  <div class="sub">Hazard identification · FHA &amp; STPA</div>
+
+  <p>FHA（功能危害评估）回答"哪个功能坏了会怎样"，自上而下；STPA 回答"控制行为在什么上下文里变成不安全的"，它不依赖"失效"这个前提，能抓到设计本身带来的危害。对单驾驶员加高自动化的 X3-F，第二层比第一层更容易漏。</p>
+
+  <div class="table-wrap">
+    <table id="fhaTable">
+      <thead>
+        <tr><th data-sort>功能</th><th>失效状态</th><th>主要阶段</th><th>效应</th><th data-sort>严重度</th><th>DAL</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="model">提供升力与推力</td><td>≥3 副旋翼单元失效</td><td>全飞行段</td><td>不可控下降</td><td><span class="tag-a">A</span></td><td class="n">A</td></tr>
+        <tr><td class="model">姿态与航迹控制</td><td>飞控输出错误姿态指令</td><td>全飞行段</td><td>失控、进入不可恢复姿态</td><td><span class="tag-a">A</span></td><td class="n">A</td></tr>
+        <tr><td class="model">能源供给</td><td>全机失电 / 电池热失控</td><td>全飞行段</td><td>推力归零、机上有火</td><td><span class="tag-a">A</span></td><td class="n">A</td></tr>
+        <tr><td class="model">分合与锁止</td><td>飞行中误分离 / 未锁到位</td><td>起飞、巡航</td><td>飞行体脱离、坠落</td><td><span class="tag-a">A</span></td><td class="n">A</td></tr>
+        <tr><td class="model">结构完整性</td><td>机臂 / 涵道 / 桨叶空中脱落</td><td>全飞行段</td><td>失衡、二次击伤</td><td><span class="tag-a">A</span></td><td class="n">A</td></tr>
+        <tr><td class="model">乘员保护</td><td>坠撞中约束失效、座舱溃缩</td><td>迫降、坠撞</td><td>乘员致命伤</td><td><span class="tag-a">A</span></td><td class="n">B</td></tr>
+        <tr><td class="model">导航与定位</td><td>位置 / 姿态源丢失或跳变</td><td>巡航、进近</td><td>偏航、进入受限空域</td><td><span class="tag-b">B</span></td><td class="n">B</td></tr>
+        <tr><td class="model">通信与数据链</td><td>C2 链路中断</td><td>全飞行段</td><td>失去监视与远程干预</td><td><span class="tag-b">B</span></td><td class="n">B</td></tr>
+        <tr><td class="model">人机接口与操纵</td><td>模式混淆、单杆误输入</td><td>起飞、着陆</td><td>错误机动、触地过载</td><td><span class="tag-b">B</span></td><td class="n">B</td></tr>
+        <tr><td class="model">告警与应急提示</td><td>低电量 / 超限告警漏报</td><td>全飞行段</td><td>错过处置窗口</td><td><span class="tag-c">C</span></td><td class="n">C</td></tr>
+        <tr><td class="model">显示与状态</td><td>关键参数显示错误</td><td>全飞行段</td><td>判断错误、操作偏差</td><td><span class="tag-c">C</span></td><td class="n">C</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="cap-note">表 4　功能失效状态清单。点表头可按功能名或严重度排序。六条"严重度 A"是这套构型的全部灾难性出口。</p>
+
+  <p>这六条里只要有一条是单点失效，10⁻⁹ 当场失守。所以在下一章里，每一条都要被追问一遍：它到底靠几重<b>独立</b>屏障。</p>
+
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 860 320" role="img" aria-label="STPA 控制结构：驾驶员、飞控、执行机构与环境">
+        <defs>
+          <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="#17161a"/>
+          </marker>
+          <marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="#9c2f1f"/>
+          </marker>
+        </defs>
+        <g fill="#faf8f2" stroke="#17161a" stroke-width="1.2">
+          <rect x="14" y="118" width="126" height="58"/>
+          <rect x="216" y="86" width="168" height="122"/>
+          <rect x="462" y="44" width="150" height="52"/>
+          <rect x="462" y="118" width="150" height="52"/>
+          <rect x="462" y="192" width="150" height="52"/>
+          <rect x="216" y="252" width="168" height="48"/>
+        </g>
+        <g font-family="var(--serif)" font-size="13" fill="#17161a">
+          <text x="77" y="142" text-anchor="middle">驾驶员</text>
+          <text x="300" y="110" text-anchor="middle">飞控计算机 ×3</text>
+          <text x="537" y="66" text-anchor="middle">6 × 电机 / 电调</text>
+          <text x="537" y="140" text-anchor="middle">分合执行机构</text>
+          <text x="537" y="214" text-anchor="middle">电池 / 配电</text>
+          <text x="300" y="276" text-anchor="middle">传感器</text>
+        </g>
+        <g font-family="var(--mono)" font-size="9.5" fill="#7a746a">
+          <text x="77" y="160" text-anchor="middle">单杆 · 触屏</text>
+          <text x="300" y="128" text-anchor="middle">表决 · 限幅 · 包线保护</text>
+          <text x="300" y="145" text-anchor="middle">模式管理 · 自动着陆</text>
+          <text x="300" y="162" text-anchor="middle">故障隔离与降级</text>
+          <text x="300" y="188" text-anchor="middle" fill="#9c2f1f">软件 / 共模风险点</text>
+          <text x="537" y="84" text-anchor="middle">差动推力控制</text>
+          <text x="537" y="158" text-anchor="middle">锁止 / 到位检测</text>
+          <text x="537" y="232" text-anchor="middle">双通道供电</text>
+          <text x="300" y="294" text-anchor="middle">IMU · GNSS · 气压 · 视觉</text>
+        </g>
+        <g stroke="#17161a" stroke-width="1.1" fill="none" marker-end="url(#ar)">
+          <line x1="140" y1="140" x2="210" y2="140"/>
+          <line x1="384" y1="104" x2="456" y2="78"/>
+          <line x1="384" y1="148" x2="456" y2="144"/>
+          <line x1="384" y1="182" x2="456" y2="212"/>
+          <line x1="300" y1="252" x2="300" y2="212"/>
+        </g>
+        <g stroke="#17161a" stroke-width="1" fill="none" stroke-dasharray="4 3" marker-end="url(#ar)">
+          <line x1="216" y1="112" x2="146" y2="126"/>
+          <line x1="462" y1="132" x2="390" y2="122"/>
+        </g>
+        <g font-family="var(--mono)" font-size="9" fill="#7a746a">
+          <text x="176" y="104">控制动作 ↓</text>
+          <text x="120" y="112">反馈 ↑</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption><b>图 2</b>STPA 控制结构。驾驶员唯一的操纵入口是"四轴合一"单杆，操纵权限高度集中在一个人和一套映射逻辑上；飞控里的软件共模点，是 2oo3 架构最容易被攻破的地方。</figcaption>
+  </figure>
+
+  <p>STPA 的产出不是"哪个部件会坏"，而是"哪个控制行为在什么上下文里变成不安全的"。下表里最要紧的是第二条：分合机构向飞控报告"锁定完成"——如果位置信号在锁舌未到位时就闭合，这条路径从地面直通空中分离。</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>控制器</th><th>控制行为</th><th>类型</th><th>上下文</th><th>后果</th></tr></thead>
+      <tbody>
+        <tr><td>驾驶员</td><td>触发分合（分离）</td><td><span class="tag-a">提供错误</span></td><td>已起飞、离地未锁感知</td><td>空中分离，飞行体失去能量与支撑</td></tr>
+        <tr><td>分合机构</td><td>报告"锁定完成"</td><td><span class="tag-a">时机过早</span></td><td>锁舌未完全到位但微动开关已闭合</td><td>带载起飞，锁止失效</td></tr>
+        <tr><td>飞控</td><td>低电量触发返航 / 迫降</td><td><span class="tag-b">未提供</span></td><td>剩余电量估算偏差、低温掉容</td><td>能量耗尽后无控坠落</td></tr>
+        <tr><td>飞控</td><td>姿态指令输出</td><td><span class="tag-a">提供错误</span></td><td>单套 IMU 故障且表决逻辑误信</td><td>错误机动、进入不可恢复姿态</td></tr>
+        <tr><td>驾驶员</td><td>接管操纵</td><td><span class="tag-b">时机过晚</span></td><td>告警优先级不明确、注意力在外部</td><td>错过 3–5 秒处置窗口</td></tr>
+        <tr><td>飞控</td><td>自动着陆</td><td><span class="tag-b">提供错误</span></td><td>侧风 / 下沉气流超出设计包线仍执行</td><td>重着陆、触地过载超限</td></tr>
+        <tr><td>BMS</td><td>热失控告警</td><td><span class="tag-a">时机过晚</span></td><td>单体内短路、传感点远离热源</td><td>告警时已不可抑制</td></tr>
+        <tr><td>地面保障</td><td>飞行前参数复位</td><td><span class="tag-b">未提供</span></td><td>维修后配平 / 限值沿用上一架次</td><td>首飞即处于异常状态</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="cap-note">表 5　不安全控制行为（UCA）。"类型"沿用 STPA 的四分法：未提供、提供错误、时机过早/过晚、持续时间错误。</p>
+
+  <p>这张表还说明另一件事：<b>把操纵简化成单杆，降低了学习门槛，却把"模式理解"的负担集中到了一个人身上</b>。低空失控时，以 50 米高度、3 米每秒下降率估算，触地前约 16 秒；扣掉感知、判断、动作，真正可用的决策时间不到 10 秒。</p>
+</section>
+
+<section id="s5">
+  <h2><span class="num">05</span>因果与定量</h2>
+  <div class="sub">Causal analysis &amp; quantitative budget</div>
+
+  <p>把上一章六条"严重度 A"画成故障树，逐条追问：它靠几重独立屏障。先说结论——独立失效那一支小到可以忽略，真正吃掉预算的是单点与共因。</p>
+
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 880 300" role="img" aria-label="X3-F 丧失可控推力的故障树">
+        <defs>
+          <marker id="ar3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="#7a746a"/>
+          </marker>
+        </defs>
+        <g fill="#faf8f2" stroke="#9c2f1f" stroke-width="1.4">
+          <rect x="310" y="8" width="260" height="50"/>
+        </g>
+        <g font-family="var(--serif)" font-size="13.5" fill="#17161a">
+          <text x="440" y="30" text-anchor="middle">飞行中丧失可控推力 / 失控</text>
+        </g>
+        <g font-family="var(--mono)" font-size="9" fill="#7a746a">
+          <text x="440" y="48" text-anchor="middle">TOP EVENT · 全部灾难性路径的汇聚点</text>
+        </g>
+
+        <path d="M420 66 Q440 92 460 66 Z" fill="none" stroke="#17161a" stroke-width="1.2"/>
+        <text x="468" y="84" font-family="var(--mono)" font-size="9" fill="#9c2f1f">OR</text>
+        <line x1="440" y1="58" x2="440" y2="66" stroke="#7a746a" stroke-width="1"/>
+        <line x1="120" y1="108" x2="760" y2="108" stroke="#7a746a" stroke-width="1"/>
+        <line x1="440" y1="92" x2="440" y2="108" stroke="#7a746a" stroke-width="1"/>
+        <line x1="120" y1="108" x2="120" y2="124" stroke="#7a746a" stroke-width="1" marker-end="url(#ar3)"/>
+        <line x1="333" y1="108" x2="333" y2="124" stroke="#7a746a" stroke-width="1" marker-end="url(#ar3)"/>
+        <line x1="547" y1="108" x2="547" y2="124" stroke="#7a746a" stroke-width="1" marker-end="url(#ar3)"/>
+        <line x1="760" y1="108" x2="760" y2="124" stroke="#7a746a" stroke-width="1" marker-end="url(#ar3)"/>
+
+        <g fill="#faf8f2" stroke="#17161a" stroke-width="1.1">
+          <rect x="24" y="126" width="192" height="86"/>
+          <rect x="237" y="126" width="192" height="86"/>
+          <rect x="451" y="126" width="192" height="86"/>
+          <rect x="664" y="126" width="192" height="86"/>
+        </g>
+        <g font-family="var(--serif)" font-size="12.5" fill="#17161a">
+          <text x="120" y="150" text-anchor="middle">推力单元失效 ≥3/6</text>
+          <text x="333" y="150" text-anchor="middle">能源丧失</text>
+          <text x="547" y="150" text-anchor="middle">飞控失效</text>
+          <text x="760" y="150" text-anchor="middle">结构与涵道失效</text>
+        </g>
+        <g font-family="var(--mono)" font-size="9" fill="#7a746a">
+          <text x="120" y="168" text-anchor="middle">AND · 独立假设</text>
+          <text x="333" y="168" text-anchor="middle" fill="#9c2f1f">OR · 单点 / 共因</text>
+          <text x="547" y="168" text-anchor="middle">2oo3 ＋ 共因 β</text>
+          <text x="760" y="168" text-anchor="middle">OR · 疲劳 / 异物</text>
+        </g>
+        <g font-family="var(--mono)" font-size="11.5">
+          <text x="120" y="190" text-anchor="middle" fill="#1f4d3f">2.5×10⁻¹²</text>
+          <text x="333" y="190" text-anchor="middle" fill="#9c2f1f">10⁻⁶ → 10⁻⁷</text>
+          <text x="547" y="190" text-anchor="middle" fill="#9c2f1f">2.0×10⁻⁶</text>
+          <text x="760" y="190" text-anchor="middle" fill="#a8641a">推定 10⁻⁷</text>
+        </g>
+        <g font-family="var(--mono)" font-size="8.5" fill="#7a746a">
+          <text x="120" y="204" text-anchor="middle">2 副失效仍可控的推论</text>
+          <text x="333" y="204" text-anchor="middle">电池热失控 / 母线短路</text>
+          <text x="547" y="204" text-anchor="middle">β=0.02 时的示例量级</text>
+          <text x="760" y="204" text-anchor="middle">机臂 / 桨叶 / 涵道</text>
+        </g>
+        <g font-family="var(--mono)" font-size="9" fill="#7a746a">
+          <text x="24" y="240">目标 10⁻⁹ / 飞行小时　·　四支合计 2.1×10⁻⁶　·　缺口三个数量级</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption><b>图 3</b>丧失可控推力故障树（剪枝到四条主支）。数值为按公开构型与假设参数推算的量级演示，不是 X3-F 的实测数据。</figcaption>
+  </figure>
+
+  <h3>两个公式</h3>
+
+  <p>六轴六桨、2 副失效仍可控，意味着需要 3 副同时失效才失控。独立假设下这是一个二项分布问题：</p>
+
+  <div class="formula">
+    <div class="eq">P(≥3) = Σ<sub>k=3..6</sub> C(6,k) · λ<sup>k</sup> · (1−λ)<sup>6−k</sup>　≈　20λ³</div>
+    <div class="where">
+      <var>λ</var>　单个推力单元（电机＋电调＋桨＋驱动）的失效率，取 5×10⁻⁵／小时<br>
+      结果　λ=5×10⁻⁵ 时约 2.5×10⁻¹²，比目标低三个数量级
+    </div>
+  </div>
+
+  <p>但飞控是 2oo3（三取二），它的失效率不是三次方那么小——独立项是 3λ²，而共因项是 βλ。β 是"共因失效占总失效率的比例"：</p>
+
+  <div class="formula">
+    <div class="eq">P<sub>飞控</sub> = 3λ<sup>2</sup> ＋ βλ　　（λ 为单套飞控失效率）</div>
+    <div class="where">
+      <var>β</var>　同一套软件、同一路电源、同一个供应商带来的相关性；工程上常落在 10⁻² ~ 10⁻⁴<br>
+      注意　β 不能靠"多装一套"降低，只能靠相异设计与独立性论证
+    </div>
+  </div>
+
+  <p>下面这个调节器可以同时拖动两个参数，看预算怎么被吃掉。默认值是我按公开构型取的示例假设：单套飞控 10⁻⁴／小时，共因比例 0.02。</p>
+
+  <div class="calc">
+    <div class="calc-head"><span>预算调节器 · <b>按严重度 A 的 10⁻⁹ 总预算分账</b></span><span>BUDGET CALCULATOR</span></div>
+    <div class="calc-body">
+      <div class="calc-in">
+        <div class="field">
+          <label>单套飞控失效率 λ <output id="outLam">1.0×10⁻⁴</output></label>
+          <input type="range" id="lam" min="0" max="100" value="33">
+        </div>
+        <div class="field">
+          <label>共因比例 β <output id="outBeta">0.0200</output></label>
+          <input type="range" id="beta" min="0" max="100" value="89">
+        </div>
+        <div class="field">
+          <label>电池单点失效率 <output id="outBat">1.0×10⁻⁶</output></label>
+          <input type="range" id="bat" min="0" max="100" value="50">
+        </div>
+        <p class="small" style="margin:4px 0 0">三个滑杆都是对数刻度。左侧为示例假设，不是 X3-F 的实测值。</p>
+      </div>
+      <div class="calc-out">
+        <div class="readout"><span>2oo3 独立项 3λ²</span><b id="rInd">3.0×10⁻⁸</b></div>
+        <div class="readout"><span>共因项 βλ</span><b id="rCc">2.0×10⁻⁶</b></div>
+        <div class="readout"><span>飞控合计</span><b id="rSum">2.0×10⁻⁶</b></div>
+        <div class="readout"><span>电池（缓解 90% 后）</span><b id="rBat">1.0×10⁻⁷</b></div>
+        <div class="readout hi"><span>整机合计 / 目标倍数</span><b id="rTot">2.1×10⁻⁶ ×2 100</b></div>
+        <div class="verdict" id="verdict"></div>
+      </div>
+    </div>
+    <div class="calc-foot">算法：飞控 = 3λ² + βλ；电池 = 单点 × (1−缓解率)；整机 = 飞控 + 电池 + 推力单元。缓解率固定 90%。全部为量级演示。</div>
+  </div>
+
+  <p>拖到 β=10⁻⁵ 时，共因项会掉到 10⁻⁹，但合计仍停在 3×10⁻⁸——因为独立项 3λ² 与 β 无关。这就是定量目标倒逼出的真正门槛：<b>单套设备本身要可靠到 10⁻⁵ 量级</b>，否则再怎么"三取二"，预算也回不到 10⁻⁹。</p>
+
+  <h3>共因清单</h3>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>共因源</th><th>波及的"冗余"</th><th>为什么危险</th><th>可用的独立性论据</th></tr></thead>
+      <tbody>
+        <tr><td class="model">电池包 / 母线</td><td>动力 2 套、供电 2 套在物理上共用</td><td>"两套供电"若最终汇到同一电池包，等于一套</td><td>物理隔离 + 独立熔断 + 分区热障</td></tr>
+        <tr><td class="model">飞控软件同源</td><td>飞控 3 套</td><td>同一份代码的同一种缺陷，三套同时触发</td><td>相异软件、独立开发团队与工具链</td></tr>
+        <tr><td class="model">共模电源 / 时钟</td><td>3 套飞控的供电与同步</td><td>单点电源故障拉垮全部通道</td><td>独立电源与独立时钟、交叉通道比较</td></tr>
+        <tr><td class="model">GNSS 拒止 / 干扰</td><td>导航、通信、感知</td><td>单一星座与单一频点被压制</td><td>多星座 + 惯导 + 视觉 / 激光备份</td></tr>
+        <tr><td class="model">涵道结冰 / 异物</td><td>同侧多副旋翼</td><td>同一气流通道内的单元同时受损</td><td>分区设计 + 防冰除冰 + FOD 防护</td></tr>
+        <tr><td class="model">维修与地面差错</td><td>全机</td><td>一次错误的参数复位影响所有通道</td><td>双人复核 + 自检 + 飞行前 BIT</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="cap-note">表 6　共因清单。每一行都对应一条"看起来有两套、实际只有一套"的隐蔽路径。</p>
+
+  <h3>关键件失效模式</h3>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>部件</th><th>失效模式</th><th>局部影响</th><th>上层影响</th><th>探测</th><th>缓解</th></tr></thead>
+      <tbody>
+        <tr><td class="model">电机 / 电调</td><td>堵转、退磁、驱动管短路</td><td>单副推力丧失</td><td>差动补偿，≥3 副时失控</td><td>转速 / 电流 / 温度监控</td><td>过流保护、单元隔离、推力裕度</td></tr>
+        <tr><td class="model">电池模组</td><td>内短路、热失控、连接件熔断</td><td>容量骤降、起火</td><td>全机失能</td><td>单体温升、电压差、气体传感</td><td>热障、泄压、熔断、独立舱</td></tr>
+        <tr><td class="model">飞控计算机</td><td>输出卡死、位翻转、看门狗失效</td><td>单通道失效</td><td>表决降级，双故障即失控</td><td>交叉通道比较、心跳</td><td>2oo3 表决、相异软件、独立供电</td></tr>
+        <tr><td class="model">分合锁</td><td>未锁到位、误开锁、疲劳裂纹</td><td>接口松动</td><td>空中分离 / 地面脱落</td><td>位置 + 载荷双确认</td><td>双余度锁、飞行中互锁、寿命试验</td></tr>
+        <tr><td class="model">桨叶 / 涵道</td><td>裂纹、脱层、异物打伤</td><td>推力不平衡、振动</td><td>结构失效、二次击伤</td><td>振动谱、目视 / 超声检查</td><td>包容性设计、损伤容限、定期检查</td></tr>
+        <tr><td class="model">线束 / 连接器</td><td>磨损、进水、接触不良</td><td>间歇性断电</td><td>通道随机失效，难复现</td><td>绝缘监测、导通自检</td><td>双路布线、物理分隔、防呆</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="cap-note">表 7　关键件 FMEA（节选）。价值不在表格本身，而在"探测"一列——凡是只能靠人眼在飞行前发现的失效，本质上都还是运行风险，不是设计已关闭的风险。</p>
+</section>
+<section id="s6">
+  <h2><span class="num">06</span>关键子系统</h2>
+  <div class="sub">Subsystem safety</div>
+
+  <p>同一套"冗余"话术套不到所有子系统上。电池要的是<b>包容</b>，推力要的是<b>裕度</b>，飞控要的是<b>独立性</b>，分合要的是<b>互锁</b>，结构要的是<b>吸能</b>，软件要的是<b>确定性</b>，人因要的是<b>时间</b>。</p>
+
+  <div class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-panel="p-bat">电池 / 热失控</button>
+    <button role="tab" aria-selected="false" data-panel="p-dep">电推进 / 涵道</button>
+    <button role="tab" aria-selected="false" data-panel="p-fcs">飞控 / 作动</button>
+    <button role="tab" aria-selected="false" data-panel="p-dock">分合机构</button>
+    <button role="tab" aria-selected="false" data-panel="p-str">结构 / 坠撞</button>
+    <button role="tab" aria-selected="false" data-panel="p-sw">软件 / 感知</button>
+    <button role="tab" aria-selected="false" data-panel="p-hf">人因 / 训练</button>
+  </div>
+
+  <div class="panel on" id="p-bat">
+    <h4>电池：要论证的不是"不着火"，而是"蔓延不可达"</h4>
+    <dl>
+      <dt>链条</dt><dd>单体内部短路 → 产气升温 → 泄压喷发 → 相邻单体被加热 → 模组连锁 → 母线失电 → 推力归零。真正要论证的是蔓延不可达，以及失去一部分容量后仍能安全降落。</dd>
+      <dt>标尺</dt><dd class="bad">车规 GB 38031 的热扩散要求是给乘员留出逃生时间；航空的逻辑是失效后仍须保持可控飞行与着陆能力。同样的电芯，在航空上需要更强的分区、熔断与独立供电。</dd>
+      <dt>季节</dt><dd class="bad">−10 ℃ 下可用容量与放电功率同时下降，"满电 6 次飞行"的承诺在冬季会打折。返航裕度若按常温标定，冬季会出现"计划内却回不来"的运行风险。</dd>
+      <dt>证据</dt><dd>公开信息中未见电芯滥用试验（针刺 / 过充 / 热箱）与包级蔓延试验的结论，只有"安全冗余"的表述。</dd>
+    </dl>
+  </div>
+
+  <div class="panel" id="p-dep">
+    <h4>电推进：推重比 &gt;2 不是性能指标，是失效预算</h4>
+    <dl>
+      <dt>裕度</dt><dd class="good">悬停只需推重比 1.0，余下的部分用来做机动、抗风，以及补偿失效单元。厂商公开"2 副旋翼失效仍可控"，等价于要求 ≥3 副同时失效才失控——这是图 3 那条 10⁻¹² 的来源。</dd>
+      <dt>涵道</dt><dd>涵道把桨叶包起来，降低了桨叶断裂飞出与地面人员误触的风险，也压低了高频噪声；代价是结构重量、前飞阻力，以及结冰与异物更容易在通道内积聚。</dd>
+      <dt>非对称</dt><dd class="bad">对角失效可以用剩余单元配平；同侧失效会同时损失滚转与俯仰的控制权限。真正需要专项验证的是最不利组合，而不是"任意两副"这句话。</dd>
+      <dt>环境</dt><dd class="bad">空气密度下降直接降低推力，散热条件同时变差。标称的 360 km/h、500 km 与"2 副失效可控"，都不必然在 40 ℃、2000 米条件下成立。</dd>
+    </dl>
+  </div>
+
+  <div class="panel" id="p-fcs">
+    <h4>飞控：3 套不是"三保险"，是"两重容错"</h4>
+    <dl>
+      <dt>架构</dt><dd>2oo3 表决在单通道失效后降为 2oo2——此时已不具备容错能力，必须限制继续飞行。所以"3 套"的正确表述是：能容忍一次故障，第二次故障就是危险状态。</dd>
+      <dt>软肋</dt><dd class="bad">如果三套跑同一份软件、共用一路电源与一个时钟，那它们在共因面前是一套。DAL A 级别的独立性需要相异软件、独立供电、独立时钟与交叉比较，且要有 CCA 证据——这些都不在公开资料里。</dd>
+      <dt>控制</dt><dd>六轴六桨靠转速差产生力矩，没有舵面，控制带宽受电机响应与桨叶惯量限制。姿态控制权限在低转速段最弱，这决定了它不能像直升机那样做大机动。</dd>
+      <dt>包线</dt><dd class="bad">包线保护能防止驾驶员把飞机飞进不可恢复状态；但保护逻辑在传感器故障时会"锁定"错误姿态。保护越强，对传感器可信度的依赖越深。</dd>
+    </dl>
+  </div>
+
+  <div class="panel" id="p-dock">
+    <h4>分合机构：全机唯一必须"想开就开、想锁就锁"的部件</h4>
+    <dl>
+      <dt>职责</dt><dd>地面要可靠解锁、空中要绝对锁死，两种相反要求压在同一套机构上。常见做法是双余度锁 + 位置与载荷双确认 + 飞控内互锁，且互锁优先级高于任何人工指令。</dd>
+      <dt>误报</dt><dd class="bad">微动开关类"到位信号"在振动、结冰、异物下容易早闭。若软件把"信号闭合"直接当"锁定完成"，就形成一条从地面直通空中分离的路径。</dd>
+      <dt>证据</dt><dd>至少需要 FMEA、CCA、寿命与疲劳试验、误操作试验四类。这是适航上的全新对象，没有现成条款可依。</dd>
+      <dt>地面</dt><dd class="bad">装载后整车质心显著上移、侧风面积增大。急弯、侧风、紧急制动下的侧翻风险属于车规范畴，却由航空部件引起，正好落在两套体系的缝里。</dd>
+    </dl>
+  </div>
+
+  <div class="panel" id="p-str">
+    <h4>结构：坠撞生存性要按"可生存但机体损毁"设计</h4>
+    <dl>
+      <dt>准则</dt><dd>通航常见的坠撞准则量级是 7–9 m/s 垂直速度（约 25–30 ft/s，推定）：座椅、约束、起落架与机身压溃段共同吸收能量，目标是保住座舱容积，而不是保住飞机。</dd>
+      <dt>材料</dt><dd class="bad">复合材料比强度高，压溃时却是脆性断裂、吸能效率低且难预测。坠撞设计常要专门的吸能结构（金属蜂窝、可压溃管），不能只靠机身本体。</dd>
+      <dt>出口</dt><dd class="bad">坠撞后舱门变形、倒扣、落水是三个独立场景。没有弹射座椅（也基本不可能有），唯一的冗余是"整机伞 + 抗坠撞结构 + 快速离机"三者叠加。</dd>
+      <dt>伞</dt><dd>汇天公开过"超低空整机多伞救生系统"，并在 X2 上完成 50 m 开伞试验。50 m 自由落体约 3.2 秒，开伞、充气、减速都要在这段时间内完成——有效，但窗口很窄，不能当主要防线。</dd>
+    </dl>
+  </div>
+
+  <div class="panel" id="p-sw">
+    <h4>软件与感知：确定性要靠流程买，不能靠测试堆</h4>
+    <dl>
+      <dt>等级</dt><dd>DAL A 的软件要求 MC/DC 级别的覆盖、独立验证与工具鉴定。把操纵、包线保护、自动着陆写进同一套软件，是审定工作量的大头。</dd>
+      <dt>预期功能</dt><dd class="bad">航空没有 ISO 21448，但有等价物：运行限制 + 包线保护 + 场景验证。差别在于航空更倾向于"禁止进入"，而不是在功能上兜住。</dd>
+      <dt>感知</dt><dd class="bad">低空环境的主要障碍不是汽车，而是电线、塔吊、鸟群与玻璃幕墙反光。毫米波对细线不敏感，视觉对逆光失效——多传感器融合解决的是概率，不是确定性。</dd>
+      <dt>更新</dt><dd class="bad">汽车可以按月 OTA；航空软件更改要重新走审定或按批准的程序管理。产品节奏越快，越容易在这条线上出问题。</dd>
+    </dl>
+  </div>
+
+  <div class="panel" id="p-hf">
+    <h4>人因：低空失控，留给人的时间只有几秒</h4>
+    <dl>
+      <dt>窗口</dt><dd class="bad">以 50 m 高度、3 m/s 下降率估算，触地前约 16 秒；扣掉感知、判断、动作，可用决策时间不到 10 秒。这与地面驾驶"看到再踩刹车"完全不是一个量级。</dd>
+      <dt>单杆</dt><dd>把四个通道压成一个直觉映射，新手更快上手；代价是驾驶员看不到单个通道的状态，一旦映射逻辑出错，人的纠错能力被削弱。</dd>
+      <dt>资质</dt><dd class="bad">课程材料指出，现有飞行员执照体系无法完全适配飞行汽车：私照与运动照的训练大纲里没有"分合操作""地面行驶—飞行切换"这些科目。</dd>
+      <dt>乘客</dt><dd class="bad">双座产品的乘客会分散注意力、提问、触碰界面。座舱设计要把"乘客可触及"的范围当成潜在误操作源来处理。</dd>
+    </dl>
+  </div>
+</section>
+
+<section id="s7">
+  <h2><span class="num">07</span>运行安全</h2>
+  <div class="sub">Operational safety</div>
+
+  <p>适航证只证明"设计在限定条件下安全"，不证明"这一次飞行安全"。运行侧的四件事——起降场、空域、维护、应急——决定实际风险。</p>
+
+  <p>下面的矩阵把危害按"可能性 × 严重度"落位。纵轴向上为可能性升高，横轴向右为严重度升高；严重度为 A 的格子一律按红色以上处理，不管乘积多小。点圆点看该条危害的场景、现有屏障与残余风险。</p>
+
+  <div class="matrix">
+    <div class="mgrid" id="mgrid"></div>
+    <div class="mdetail" id="mdetail"></div>
+  </div>
+  <p class="cap-note">图 4　危害风险矩阵（11 条）。风险值 = 可能性 × 严重度，但严重度 A 设了颜色下限，避免"极罕见"把灾难性刷成绿色。</p>
+
+  <h3>运行限制：把风险"框"在外面</h3>
+
+  <p>私人娱乐这一档的安全，很大一部分不是靠设计，而是靠运行限制把暴露面收窄：昼间、目视、隔离空域、营地围界。这些限制不是免责声明，它们本身就是安全论证的一部分。</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>限制项</th><th>典型要求（推定）</th><th>为什么必须有</th><th>突破后的后果</th></tr></thead>
+      <tbody>
+        <tr><td class="model">昼间目视</td><td>仅昼间、VFR、云底高与能见度达标</td><td>感知与避让依赖人眼，夜间无可靠手段</td><td>空中相撞、误入障碍</td></tr>
+        <tr><td class="model">风速 / 阵风</td><td>起降段风速上限、侧风分量限制</td><td>六轴构型抗风能力有限，余量被失效补偿吃掉</td><td>姿态失控、重着陆</td></tr>
+        <tr><td class="model">空域与航线</td><td>隔离空域、预先申报、避开人口密集区</td><td>第三方地面风险的主要控制手段</td><td>坠撞造成地面伤亡</td></tr>
+        <tr><td class="model">起降场</td><td>净空、安全间距、消防与围界</td><td>起降段是失效最集中的阶段</td><td>伤及地面人员、火灾蔓延</td></tr>
+        <tr><td class="model">维护</td><td>航前 / 航后检查、周期检查、电池健康度</td><td>分合机构与电池是消耗件</td><td>带故障起飞</td></tr>
+        <tr><td class="model">人员资质</td><td>驾驶资质、营地操作员培训</td><td>单驾驶员体系下，人的能力就是最后一道屏障</td><td>误操作、处置失当</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="cap-note">表 8　运行限制。它们对应的是"剩余风险"，即设计已经尽力、剩下的靠怎么飞来控制的那一部分。</p>
+
+  <p>还有一条常被忽略：<b>第三方风险</b>。私人娱乐飞行若发生在营地或景区，地面有非乘员人群。航空的 10⁻⁹ 是对乘员说的，对地面第三方通常另有更严的暴露控制；这条线靠隔离空域与场地围界守，而不是靠冗余。同理，营地火灾与救援响应时间也属于运行安全论证，却极少出现在产品宣传里。</p>
+</section>
+<section id="s8">
+  <h2><span class="num">08</span>论证与结论</h2>
+  <div class="sub">Assurance &amp; verdict</div>
+
+  <p>安全论证（GSN）的结构是"目标—策略—子目标—证据"。它的价值在于把"我觉得安全"变成"哪条证据支持哪个结论"。下面这张图按这个结构搭，最下面的缺口是目前公开信息里空着的位置。</p>
+
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 860 400" role="img" aria-label="X3-F 安全论证（GSN）结构">
+        <defs>
+          <marker id="ar4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="#7a746a"/>
+          </marker>
+        </defs>
+        <g fill="#faf8f2" stroke="#17161a" stroke-width="1.2">
+          <rect x="270" y="8" width="320" height="54"/>
+          <rect x="250" y="80" width="360" height="56"/>
+          <rect x="14" y="158" width="262" height="54"/>
+          <rect x="299" y="158" width="262" height="54"/>
+          <rect x="584" y="158" width="262" height="54"/>
+          <rect x="14" y="244" width="262" height="46" stroke-dasharray="4 3"/>
+          <rect x="299" y="244" width="262" height="46" stroke-dasharray="4 3"/>
+          <rect x="584" y="244" width="262" height="46" stroke-dasharray="4 3"/>
+        </g>
+        <g font-family="var(--serif)" font-size="13" fill="#17161a">
+          <text x="430" y="42" text-anchor="middle">X3-F 在拟定运行场景下具有可接受的安全性</text>
+          <text x="430" y="114" text-anchor="middle" font-size="12">按 ARP4754A / 4761 完成 FHA → PSSA → SSA</text>
+          <text x="430" y="130" text-anchor="middle" font-size="12">并用运行限制收窄暴露</text>
+          <text x="145" y="184" text-anchor="middle" font-size="12.5">危害已被完整识别</text>
+          <text x="430" y="184" text-anchor="middle" font-size="12.5">每条灾难性路径 ≤10⁻⁹/h</text>
+          <text x="715" y="184" text-anchor="middle" font-size="12.5">剩余风险被运行限制控制</text>
+        </g>
+        <g font-family="var(--mono)" font-size="9" fill="#7a746a">
+          <text x="286" y="26">GOAL G1</text>
+          <text x="266" y="96">STRATEGY S1</text>
+          <text x="30" y="176">GOAL G2</text>
+          <text x="315" y="176">GOAL G3</text>
+          <text x="600" y="176">GOAL G4</text>
+          <text x="30" y="262">EVIDENCE E1</text>
+          <text x="315" y="262">EVIDENCE E2</text>
+          <text x="600" y="262">EVIDENCE E3</text>
+        </g>
+        <g font-family="var(--mono)" font-size="9.5" fill="#4c4840">
+          <text x="145" y="200" text-anchor="middle">FHA · STPA · HAZOP</text>
+          <text x="430" y="200" text-anchor="middle">FTA · CCA · FMEA · 试验</text>
+          <text x="715" y="200" text-anchor="middle">空域 · 场地 · 维护 · 训练</text>
+          <text x="145" y="272" text-anchor="middle">危害清单与严重度分级记录</text>
+          <text x="430" y="272" text-anchor="middle">失效概率计算 + 台架 / 试飞证据</text>
+          <text x="715" y="272" text-anchor="middle">运行手册 · 限制 · 训练大纲</text>
+        </g>
+        <g stroke="#7a746a" stroke-width="1" fill="none" marker-end="url(#ar4)">
+          <line x1="430" y1="62" x2="430" y2="78"/>
+          <line x1="430" y1="136" x2="430" y2="142"/>
+          <line x1="145" y1="142" x2="715" y2="142"/>
+          <line x1="145" y1="142" x2="145" y2="156"/>
+          <line x1="430" y1="142" x2="430" y2="156"/>
+          <line x1="715" y1="142" x2="715" y2="156"/>
+          <line x1="145" y1="212" x2="145" y2="242"/>
+          <line x1="430" y1="212" x2="430" y2="242"/>
+          <line x1="715" y1="212" x2="715" y2="242"/>
+        </g>
+        <g fill="#faf8f2" stroke="#9c2f1f" stroke-width="1.2">
+          <rect x="14" y="316" width="832" height="70"/>
+        </g>
+        <g font-family="var(--mono)" font-size="9.5" fill="#9c2f1f">
+          <text x="30" y="336">GAP · 目前公开信息中缺失的证据</text>
+        </g>
+        <g font-family="var(--serif)" font-size="12.5" fill="#17161a">
+          <text x="30" y="356">SSA / CCA 结论未公开　·　专用条件尚未定稿　·　分合寿命与互锁验证未见　·　整机伞构型待确认</text>
+          <text x="30" y="376">没有这四类证据，G3 只能算"有论证框架"，不能算"论证成立"。</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption><b>图 5</b>安全论证结构。越往下越具体：目标 → 策略 → 三个子目标 → 三类证据；红色框是空着的位置。</figcaption>
+  </figure>
+
+  <h3>证据在哪儿</h3>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>证据类型</th><th>验证对象</th><th>回答的问题</th><th>公开可见度</th></tr></thead>
+      <tbody>
+        <tr><td class="model">静力 / 疲劳试验</td><td>机身、机臂、接口</td><td>极限载荷下不破坏、寿命内不裂</td><td>零星见于宣传</td></tr>
+        <tr><td class="model">坠撞试验</td><td>座舱、座椅、约束</td><td>可生存坠撞下保住座舱容积</td><td class="bad">未见公开</td></tr>
+        <tr><td class="model">电池滥用试验</td><td>电芯、模组、包</td><td>针刺 / 过充 / 热箱后不蔓延</td><td class="bad">未见公开</td></tr>
+        <tr><td class="model">HIRF / EMC</td><td>全机电子系统</td><td>强场下不误动作</td><td class="bad">未见公开</td></tr>
+        <tr><td class="model">软件适航（DO-178C）</td><td>飞控、显示、BMS</td><td>DAL 等级对应的覆盖与独立性</td><td class="bad">未见公开</td></tr>
+        <tr><td class="model">台架 / 铁鸟</td><td>飞控闭环、余度切换</td><td>故障注入后仍可控</td><td class="bad">未见公开</td></tr>
+        <tr><td class="model">试飞（包线扩展、三高）</td><td>操稳、性能、环境适应性</td><td>设计值是否在包线内成立</td><td>有视频与"已开展"表述</td></tr>
+        <tr><td class="model">分合寿命试验</td><td>锁止机构、导向</td><td>每日循环下的疲劳与公差</td><td class="bad">未见公开</td></tr>
+        <tr><td class="model">整机伞试验</td><td>救生系统</td><td>最低开伞高度与下降率</td><td>X2 上完成 50 m 开伞</td></tr>
+        <tr><td class="model">运行验证（沙盒 / 营地）</td><td>运行程序、人员</td><td>真实环境下的事故率</td><td>有沙盒与交付表述</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="cap-note">表 9　证据类型与公开可见度。"未见公开"不等于"没做"，但安全论证的规矩是：没有证据就不能主张结论。</p>
+
+  <h3>结论</h3>
+
+  <div class="ruling keep">
+    <div class="hd"><b>裁定一 · 架构</b><i>成立</i></div>
+    <div class="bd">
+      <p>六轴六桨 + 2 副失效容错、飞控 / 供电 / 通信 / 操控多通道冗余、涵道包容，这套架构在工程上说得通；关键子系统的失效模式与缓解手段也都有对应的成熟做法。它不需要发明新原理，只需要把证据做扎实。</p>
+    </div>
+  </div>
+
+  <div class="ruling cond">
+    <div class="hd"><b>裁定二 · 安全论证</b><i>条件成立</i></div>
+    <div class="bd">
+      <p>在"私人娱乐、昼间、隔离空域、营地起降、非商业载客"这套场景下，安全论证有闭合的可能；前提是 SSA 与 CCA 能拿出结论、专用条件定稿、分合机构的互锁与寿命得到验证。这三件事现在都还没有公开证据。</p>
+    </div>
+  </div>
+
+  <div class="ruling">
+    <div class="hd"><b>裁定三 · 10⁻⁹ 目标</b><i>未完成，不是不满足</i></div>
+    <div class="bd">
+      <p>按公开构型做的量级测算，合计落在 10⁻⁶ 附近，比目标高三个数量级。但这个数字完全取决于 β 与单套设备失效率——它是"用示例参数算出来的缺口"，不是对 X3-F 的符合性判定。要么证明 β 在 10⁻⁵ 量级、单套设备在 10⁻⁵ 量级，要么承认这条预算在私人娱乐档位另有口径。</p>
+    </div>
+  </div>
+
+  <p>一句话收尾：它更像一架"被允许更早起飞的小型有人飞行器"，而不是"被放大的消费电子"。评价它的安全水平，不该看发布会上的冗余数字，而该问三个问题——<b>共因分析做了没有、分合机构的互锁有多硬、最坏那一次坠撞里人还能不能出来</b>。</p>
+</section>
+
+<section id="s9">
+  <h2><span class="num">09</span>引用</h2>
+  <div class="sub">References</div>
+
+  <p>标准条款按公开摘要与课程讲义转述，未逐条引用原文。文中标注"推定"与"示例"的数字，均为按构型与框架推导的量级演示。</p>
+
+  <ol class="refs">
+    <li>课程讲义《第四章 飞行汽车的现状及展望》，张玉新，吉林大学，2026。<em>安全方法学、10⁻⁹ 目标、作业要求</em></li>
+    <li>课程讲义《第五章 飞行汽车产业分析及支撑技术》，同上。<em>系统安全工程九步法、审定基础与标准体系</em></li>
+    <li><a href="https://www.easa.europa.eu/en/document-library/product-certification-consultations/special-condition-vtol">EASA SC-VTOL-01 专用条件</a><em>eVTOL 适航技术框架</em></li>
+    <li><a href="https://www.sae.org/standards/content/arp4754a/">SAE ARP4754A</a><em>民用飞机与系统开发指南</em></li>
+    <li><a href="https://www.sae.org/standards/content/arp4761/">SAE ARP4761</a><em>安全评估过程：FHA / PSSA / SSA / CCA</em></li>
+    <li><a href="https://www.rtca.org/">RTCA DO-178C</a><em>机载软件，DAL A–D</em></li>
+    <li><a href="http://www.caac.gov.cn/">中国民航局 · CCAR-21</a><em>民用航空产品和零部件合格审定规定</em></li>
+    <li><a href="https://www.cnstock.com/commonDetail/377540">上海证券报：X3-F 专用条件征求意见</a><em>私人娱乐定位、最大起飞重量 960 kg</em></li>
+    <li><a href="https://chejiahao.autohome.com.cn/info/16675705">车家号：陆地航母首飞与冗余配置</a><em>动力 2 / 飞控 3 / 供电 2 / 通信 2 / 操控 2</em></li>
+    <li><a href="https://bbs.xiaopeng.com/article/3511676">小鹏社区：六轴六桨双涵道构型</a><em>碳纤维机身与桨叶</em></li>
+    <li><a href="https://www.163.com/dy/article/IHT1N9FE05279L3C.html">网易：双旋翼失效仍可控；超低空多伞救生系统</a><em>X2 上 50 m 开伞试验</em></li>
+    <li><a href="https://chejiahao.autohome.com.cn/article/14373926">汽车之家：早期构型口径（八组电池 / 4 轴 8 桨）</a><em>用于说明构型迭代</em></li>
+    <li><a href="https://lab.autozyx.com/fundamentals-of-flying-vehicle-technology/tesla-flying-roadster/">课程给出的作业样例（Tesla Roadster 调研页）</a><em>体例参考</em></li>
+  </ol>
+</section>
+
+<footer>
+  <div class="rule"></div>
+  <div>飞行汽车技术基础 · 课程作业-2　|　对象：小鹏汇天「陆地航母」X3-F　|　资料截至 2026-11</div>
+  <div>单文件 · 零外部依赖 · 可离线打开　|　快捷键：P 打印　·　Esc 回顶</div>
+  <div>教学研究用途；文中推定与示例数值不构成对该型号适航符合性的判断。</div>
+</footer>
+
+</div>
+
+<div class="toolbar">
+  <button id="btnTop" title="回到顶部（Esc）" aria-label="回到顶部">↑</button>
+  <button id="btnPrint" title="打印 / 存 PDF（P）" aria-label="打印">PDF</button>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+
+  /* 进度 */
+  var bar = $('#progress');
+  function onScroll() {
+    var h = document.documentElement.scrollHeight - window.innerHeight;
+    bar.style.width = (h > 0 ? (window.scrollY / h) * 100 : 0) + '%';
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  /* 目录高亮（按滚动位置取最近一章） */
+  var links = $$('#toc a');
+  var secs = $$('section');
+  function syncToc() {
+    var y = window.scrollY + 150, cur = secs[0];
+    secs.forEach(function (s) { if (s.offsetTop <= y) cur = s; });
+    links.forEach(function (a) {
+      a.classList.toggle('on', !!cur && a.getAttribute('href') === '#' + cur.id);
+    });
+  }
+  window.addEventListener('scroll', syncToc, { passive: true });
+  syncToc();
+
+  /* 标签页 */
+  var tabs = $$('.tabs button');
+  tabs.forEach(function (t) {
+    t.addEventListener('click', function () {
+      tabs.forEach(function (x) { x.setAttribute('aria-selected', 'false'); });
+      t.setAttribute('aria-selected', 'true');
+      $$('.panel').forEach(function (p) { p.classList.toggle('on', p.id === t.dataset.panel); });
+    });
+  });
+
+  /* 表头排序 */
+  $$('th[data-sort]').forEach(function (th) {
+    th.addEventListener('click', function () {
+      var table = th.closest('table');
+      var idx = Array.prototype.indexOf.call(th.parentElement.children, th);
+      var dir = th.dataset.dir === 'asc' ? 'desc' : 'asc';
+      $$('th[data-sort]', table).forEach(function (o) { o.removeAttribute('data-dir'); });
+      th.dataset.dir = dir;
+      var rows = $$('tbody tr', table);
+      rows.sort(function (a, b) {
+        var av = a.children[idx].textContent.trim(), bv = b.children[idx].textContent.trim();
+        return dir === 'asc' ? av.localeCompare(bv, 'zh') : bv.localeCompare(av, 'zh');
+      });
+      var tb = $('tbody', table);
+      rows.forEach(function (r) { tb.appendChild(r); });
+    });
+  });
+
+  /* 预算调节器 */
+  var lam = $('#lam'), beta = $('#beta'), bat = $('#bat');
+  if (lam) {
+    var TARGET = 1e-9;
+    var fmt = function (p) {
+      var s = p.toExponential(1).replace('e-', '×10⁻').replace('e+', '×10');
+      return s;
+    };
+    var mult = function (p) {
+      var m = p / TARGET;
+      if (m < 10) return '×' + m.toFixed(1);
+      if (m < 1e5) return '×' + Math.round(m).toLocaleString('en-US');
+      return '×' + m.toExponential(0).replace('e+', '×10');
+    };
+    var update = function () {
+      var L = Math.pow(10, -5 + (lam.value / 100) * 3);            /* 1e-5 .. 1e-2 */
+      var B = Math.pow(10, -5 + (beta.value / 100) * 3.699);        /* 1e-5 .. 5e-2 */
+      var R = Math.pow(10, -7 + (bat.value / 100) * 2);             /* 1e-7 .. 1e-5 */
+      var ind = 3 * L * L, cc = B * L, sum = ind + cc;
+      var batt = R * 0.1, tot = sum + batt + 2.5e-12;
+      $('#outLam').textContent = fmt(L);
+      $('#outBeta').textContent = B >= 0.001 ? B.toFixed(4) : B.toExponential(1).replace('e-', '×10⁻');
+      $('#outBat').textContent = fmt(R);
+      $('#rInd').textContent = fmt(ind);
+      $('#rCc').textContent = fmt(cc);
+      $('#rSum').textContent = fmt(sum);
+      $('#rBat').textContent = fmt(batt);
+      $('#rTot').textContent = fmt(tot) + ' ' + mult(tot);
+      var share = Math.round(cc / sum * 100);
+      var verdict;
+      if (tot <= TARGET) {
+        verdict = '在预算内。此时主导项是 <b>' + (ind > batt ? '独立项 3λ²' : '电池单点') + '</b>，共因占飞控 ' + share + '%。';
+      } else {
+        verdict = '超出目标 <b>' + mult(tot).slice(1) + '</b>。共因占飞控 ' + share +
+          '%，' + (cc > ind ? '主导项是共因 βλ' : '主导项是独立项 3λ²') +
+          '——把 β 拖到 10⁻⁵ 可以看到，共因消失后仍压不到目标。';
+      }
+      $('#verdict').innerHTML = verdict;
+    };
+    [lam, beta, bat].forEach(function (el) { el.addEventListener('input', update); });
+    update();
+  }
+
+  /* 风险矩阵 */
+  var HZ = [
+    { id: 'H1', n: '空中分离', s: 4, p: 1, d: '分合锁在飞行中解锁，飞行体脱离', c: '双余度锁 + 飞行中互锁 + 到位双确认', r: '互锁失效是最难排除的路径；需专项 FMEA 与误操作试验' },
+    { id: 'H2', n: '电池热失控', s: 4, p: 2, d: '单体短路蔓延至整包，推力归零并起火', c: '热障 / 熔断 / 独立舱 / BMS 预警', r: '缓解后仍是单点；毒烟与座舱完整性另需论证' },
+    { id: 'H3', n: '飞控共因失效', s: 4, p: 1, d: '同源软件或共模电源同时打掉三套通道', c: '相异软件 + 独立供电 + 交叉比较', r: 'β 未公开前，冗余的独立性无法判断' },
+    { id: 'H4', n: '重着陆 / 硬着陆', s: 3, p: 4, d: '下沉气流或侧风超限，触地过载超限', c: '包线保护 + 自动着陆限制 + 训练', r: '保护逻辑依赖传感器可信度' },
+    { id: 'H5', n: '分合未锁到位', s: 3, p: 3, d: '带载起飞，锁止在振动中失效', c: '载荷 / 位移双确认 + 飞控互锁', r: '微动开关早闭是典型误报点' },
+    { id: 'H6', n: '低空风切变', s: 3, p: 3, d: '起降段遭遇下沉气流，高度不可恢复', c: '风速限制 + 场地选址 + 气象窗口', r: '低空气象预报精度本身有限' },
+    { id: 'H7', n: '地面第三方伤亡', s: 4, p: 2, d: '坠撞或掉件落在营地区域内的人员', c: '隔离空域 + 场地围界 + 航线避开人群', r: '第三方风险的控制完全依赖运行管理' },
+    { id: 'H8', n: '营地充电火灾', s: 2, p: 3, d: '高倍率充电引发热失控，波及建筑', c: '充电监控 + 消防 + 间距', r: '地面火灾常被排除在"飞行安全"之外' },
+    { id: 'H9', n: '数据链中断', s: 2, p: 4, d: '失去监视与远程干预能力', c: '双链路 + 自主返航', r: '对有人驾驶影响有限，对远程接管影响大' },
+    { id: 'H10', n: '噪声扰民', s: 1, p: 5, d: '起降与低空通过时的持续噪声', c: '涵道降噪 + 航线避让 + 时段限制', r: '社区接受度可能比技术指标更早成为瓶颈' },
+    { id: 'H11', n: '桨叶断裂击伤', s: 3, p: 2, d: '桨叶失效飞出，伤及地面人员', c: '涵道包容 + 损伤容限 + 检查', r: '涵道提供包容，但开口方向仍有暴露' }
+  ];
+  var SEV = { 1: 'D 轻微', 2: 'C 重大', 3: 'B 危险', 4: 'A 灾难' };
+  var PROB = { 5: '频繁', 4: '可能', 3: '偶发', 2: '罕见', 1: '极罕见' };
+  var grid = $('#mgrid');
+  if (grid) {
+    var cls = function (p, s) {
+      var e = Math.max(p * s, s === 4 ? 13 : s === 3 ? 9 : 0);
+      return e <= 4 ? 'r1' : e <= 8 ? 'r2' : e <= 12 ? 'r3' : e <= 16 ? 'r4' : 'r5';
+    };
+    var html = '<div class="hd"></div>';
+    [1, 2, 3, 4].forEach(function (s) { html += '<div class="hd">' + SEV[s] + '</div>'; });
+    for (var p = 5; p >= 1; p--) {
+      html += '<div class="hd">' + PROB[p] + '</div>';
+      [1, 2, 3, 4].forEach(function (s) {
+        html += '<div class="cell ' + cls(p, s) + '" data-p="' + p + '" data-s="' + s + '"></div>';
+      });
+    }
+    grid.innerHTML = html;
+    var detail = $('#mdetail');
+    var show = function (h, el) {
+      $$('.mdot').forEach(function (x) { x.classList.remove('on'); });
+      if (el) el.classList.add('on');
+      detail.innerHTML = '<b>' + h.id + ' ' + h.n + '</b>　严重度 ' + SEV[h.s] + ' × 可能性 ' + PROB[h.p] +
+        ' = ' + (h.s * h.p) + '<br>场景：' + h.d + '<br>现有屏障：' + h.c + '<br>残余：' + h.r;
+    };
+    HZ.forEach(function (h) {
+      var cell = grid.querySelector('.cell[data-p="' + h.p + '"][data-s="' + h.s + '"]');
+      if (!cell) return;
+      var d = document.createElement('span');
+      d.className = 'mdot';
+      d.textContent = h.id.slice(1);
+      d.title = h.n;
+      d.addEventListener('click', function () { show(h, d); });
+      cell.appendChild(d);
+    });
+    show(HZ[0], grid.querySelector('.mdot'));
+  }
+
+  /* 工具条 */
+  $('#btnTop').addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+  $('#btnPrint').addEventListener('click', function () { window.print(); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'p' || e.key === 'P') window.print();
+    if (e.key === 'Escape') window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+})();
+</script>
+</body>
+</html>
+
+
+
